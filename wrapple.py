@@ -5,6 +5,8 @@ import os
 import argparse
 import sys
 
+#TODO: Try BeautifulSoup instead of the splits
+
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-e','--email', nargs=1) 
 parser.add_argument('-d','--description',nargs=1)
@@ -35,6 +37,22 @@ if (cutoff<2 or cutoff>10):
 snp_file = open(filename,'r')
 snps =snp_file.read()
 
+def get_results(status_page_list):
+    for l in status_page_list:
+        if '_summary' in l:
+            temp =  l.split(">")
+            for t in temp:
+                if 'http:' in t:
+                    file =t.split("/")[-1].split("\"")[0] 
+                    #command = 'wget ' + t.split("\"")[1]
+                    #TODO:Check if directory exists before mkdir
+                    make_dir = 'mkdir ' + description
+                    os.system(make_dir)
+                    file = description+'/'+file
+                    command = 'curl ' + t.split("\"")[1] + '>' +file 
+                    os.system(command)
+
+
 def check_status():
     try:
         status_page = urllib2.urlopen(link) 
@@ -48,20 +66,7 @@ def check_status():
             t= line.split("<BR>")
             print t[2] + "\t" + t[3].split("<a href")[0]
             if 'FINISHED' in t[2]:
-                for l in status_page_list:
-                    if '_summary' in l:
-                        temp =  l.split(">")
-                        for t in temp:
-                            if 'http:' in t:
-                                file =t.split("/")[-1].split("\"")[0] 
-                                #command = 'wget ' + t.split("\"")[1]
-                                #TODO:Check if directory exists before mkdir
-                                make_dir = 'mkdir ' + description
-                                os.system(make_dir)
-                                file = description+'/'+file
-                                command = 'curl ' + t.split("\"")[1] + '>' +file 
-                                os.system(command)
-                        
+                get_results(status_page_list)
             else:
                 time.sleep(wait*60)
                 return check_status()
@@ -71,7 +76,7 @@ raw_params = {'genome':genome,'numberPermutations':perm,'CIcutoff':cutoff,'regUp
 params = urllib.urlencode(raw_params)
 request = urllib2.Request(page, params)
 page = urllib2.urlopen(request)
-page_list = page.read().split("\t")
+page_list = page.read().split("\n")
 
 for line in page_list:
     if 'status' in line:
@@ -79,4 +84,4 @@ for line in page_list:
             
 print "The link to the status page and results is: " + link
 
-#check_status()
+check_status()
