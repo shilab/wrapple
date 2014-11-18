@@ -65,12 +65,7 @@ def main():
                         +'Options:2-10\nDefault:2')
     args = parser.parse_args()
 
-    #email = args.email[0]
-    #description = args.description[0]
     filename = args.snpfile[0]
-    wait = args.wait
-    perm = args.permutations
-    #genome = args.genome
     cutoff = int(args.ci_cutoff)
 
     if args.genome != '19' and args.genome != '18' and args.genome != '1kg':
@@ -86,7 +81,7 @@ def main():
     snps = snp_file.read()
 
     page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
-    raw_params = {'genome':args.genome, 'numberPermutations':perm,
+    raw_params = {'genome':args.genome, 'numberPermutations':args.permutations,
                   'CIcutoff':cutoff, 'regUp':'50', 'regDown':'50',
                   'snpListFile':'filename=""', 'snpList':snps,
                   'genesToSpecifyFile':'filename=""', 'genesToSpecify':'',
@@ -103,7 +98,7 @@ def main():
 
     print "The link to the status page and results is: " + link
 
-    check_status(link, wait, args.description[0])
+    check_status(link, args.wait, args.description[0])
 
 if __name__ == "__main__":
     main()
