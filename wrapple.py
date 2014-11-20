@@ -16,7 +16,6 @@ def get_results(status_page_list, description):
             for tag in temp:
                 if 'http:' in tag:
                     outfile = tag.split("/")[-1].split("\"")[0]
-                    #command = 'wget ' + t.split("\"")[1]
                     #TODO:Check if directory exists before mkdir
                     make_dir = 'mkdir ' + description
                     os.system(make_dir)
