@@ -1,5 +1,5 @@
 """Python wrapper for DAPPLE"""
-
+__version__ = "0.0.1"
 import urllib, urllib2
 import time
 import os
@@ -62,6 +62,8 @@ def main():
     parser.add_argument('-c', '--ci_cutoff', nargs='?', default=2,
                         help='Common Interactor Binding Degree Cuttoff:\n'
                         +'Options:2-10\nDefault:2')
+    parser.add_argument('-v', '--version', action='version',
+                        version='%(prog)s ' + __version__)
     args = parser.parse_args()
 
     filename = args.snpfile[0]
