@@ -22,6 +22,7 @@ def get_results(status_page_list, description):
                     outfile = description+'/'+ outfile
                     command = 'curl ' + tag.split("\"")[1] + ' -o ' + outfile
                     os.system(command)
+                    print command
 
 
 def check_status(link, wait, description):
@@ -63,8 +64,8 @@ def main():
     parser.add_argument('-c', '--ci_cutoff', nargs='?', default=2,
                         help='Common Interactor Binding Degree Cuttoff:\n'
                         +'Options:2-10\nDefault:2')
-    parser.add_argument('-i', '--input', nargs=1, help='Specify the type of input.'
-                        + 'S: SNP\nR: Region\nC: Combination\n'+
+    parser.add_argument('-i', '--input', nargs=1, help='Specify the type '
+                        +'of input.S: SNP\nR: Region\nC: Combination\n'+
                         'GR: Gene-Region\nG: Gene\nDefault is Gene',
                         default='G')
     parser.add_argument('-us', '--upstream', nargs='?',
@@ -115,18 +116,22 @@ def main():
         zoomed_genes = open(args.zoom_to_gene, 'r').read()
         zoomed_genes = zoomed_genes.rstrip()
         zoomed_genes = zoomed_genes.replace('\n', ',')
+    else:
+        zoomed_genes = ''
 
     #TODO: When file upload is working, check snpfile if exists
     snp_file = open(filename, 'r')
     snps = snp_file.read()
 
     if ((args.upstream != 'None' and args.downstream != 'None') and
-            args.input != 'G'):
+            args.input[0] == 'G'):
         print 'Regulatory regions can\'t be used with gene input'
         sys.exit()
 
-    if args.nearest != 'None' and (args.input != 'S' or args.input != 'R'):
+    if (args.nearest != 'None' and not (args.input[0] != 'S' or
+      args.input[0] != 'R')):
         print 'Nearest genes can only be used with SNP or region input'
+        sys.exit()
 
     page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
     raw_params = {'genome':args.genome, 'numberPermutations':args.permutations,
