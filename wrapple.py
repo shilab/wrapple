@@ -54,6 +54,7 @@ def main():
                         help='Check status page every -w minutest.\n'
                         + 'Longer wait times suggested for larger datasets.\n'
                         'Default is 1 minute.')
+    #TODO: Add options
     parser.add_argument('-p', '--permutations', nargs='?', default=1000,
                         help='Number of permutations to run. Default is 1000')
     parser.add_argument('-g', '--genome', nargs='?', default='19',
@@ -62,12 +63,27 @@ def main():
     parser.add_argument('-c', '--ci_cutoff', nargs='?', default=2,
                         help='Common Interactor Binding Degree Cuttoff:\n'
                         +'Options:2-10\nDefault:2')
+    parser.add_argument('-i', '--input', nargs=1, help='Specify the type of input.'
+                        + 'S: SNP\nR: Region\nC: Combination\n'+
+                        'GR: Gene-Region\nG: Gene\nDefault is Gene',
+                        default='G')
+    parser.add_argument('-us', '--upstream', nargs='?',
+                        help='Define gene regulatory region. Can only be '
+                        + 'used with SNP and region input. In kb')
+    parser.add_argument('-ds', '--downstream', nargs='?',
+                        help='Define gene regulatory region. Can only be '
+                        + 'with SNP and region input. In kb')
+    parser.add_argument('-n', '--nearest', action='store_true',
+                        help='Use nearest gene for SNP input, instead of all '
+                        + 'genes in the chosen region')
     parser.add_argument('-pl', '--plot', help='Plot the network',
                         action='store_true')
     parser.add_argument('-cp', '--color_plot', help='Color plot by p-value',
                         action='store_true')
     parser.add_argument('-s', '--simplify_plot', help='Simplify plot',
                         action='store_true')
+    parser.add_argument('-z', '--zoom_to_gene',
+                        help='Create a subplot with only the genes specified')
     parser.add_argument('-v', '--version', action='version',
                         version='%(prog)s ' + __version__)
     args = parser.parse_args()
@@ -92,22 +108,36 @@ def main():
     if args.color_plot == True:
         args.color_plot = 'true'
 
-    print args.plot
-    print args.simplify_plot
-    print args.color_plot
+    if args.nearest == True:
+        args.nearest = 'true'
+
+    if args.zoom_to_gene != None:
+        zoomed_genes = open(args.zoom_to_gene, 'r').read()
+        zoomed_genes = zoomed_genes.rstrip()
+        zoomed_genes = zoomed_genes.replace('\n', ',')
 
     #TODO: When file upload is working, check snpfile if exists
     snp_file = open(filename, 'r')
     snps = snp_file.read()
 
+    if ((args.upstream != 'None' and args.downstream != 'None') and
+            args.input != 'G'):
+        print 'Regulatory regions can\'t be used with gene input'
+        sys.exit()
+
+    if args.nearest != 'None' and (args.input != 'S' or args.input != 'R'):
+        print 'Nearest genes can only be used with SNP or region input'
+
     page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
     raw_params = {'genome':args.genome, 'numberPermutations':args.permutations,
-                  'CIcutoff':cutoff, 'regUp':'50', 'regDown':'50',
+                  'CIcutoff':cutoff, 'regUp':args.upstream,
+                  'regDown':args.downstream, 'nearestgene': args.nearest,
                   'snpListFile':'filename=""', 'snpList':snps,
                   'genesToSpecifyFile':'filename=""', 'plot':args.plot,
                   'plotP':args.color_plot, 'collapseCI':args.simplify_plot,
-                  'genesToSpecify':'', 'zoomedGenes':'', 'email':args.email[0],
-                  'description':args.description[0], 'submit':'submit'}
+                  'genesToSpecify':'', 'zoomedGenes':zoomed_genes,
+                  'email':args.email[0], 'description':args.description[0],
+                  'submit':'submit'}
     params = urllib.urlencode(raw_params)
     request = urllib2.Request(page, params)
     page = urllib2.urlopen(request)
