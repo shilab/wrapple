@@ -123,10 +123,10 @@ def main():
     snp_file = open(filename, 'r')
     snps = snp_file.read()
 
-    if ((args.upstream != 'None' and args.downstream != 'None') and
-            args.input[0] == 'G'):
-        print 'Regulatory regions can\'t be used with gene input'
-        sys.exit()
+    if args.upstream == None:
+        args.upstream = 50
+    if args.downstream == None:
+        args.downstream = 50
 
     if (args.nearest != 'None' and not (args.input[0] != 'S' or
       args.input[0] != 'R')):
@@ -136,7 +136,7 @@ def main():
     page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
     raw_params = {'genome':args.genome, 'numberPermutations':args.permutations,
                   'CIcutoff':cutoff, 'regUp':args.upstream,
-                  'regDown':args.downstream, 'nearestgene': args.nearest,
+                  'regDown':args.downstream, 'nearestgene':args.nearest,
                   'snpListFile':'filename=""', 'snpList':snps,
                   'genesToSpecifyFile':'filename=""', 'plot':args.plot,
                   'plotP':args.color_plot, 'collapseCI':args.simplify_plot,
@@ -144,6 +144,7 @@ def main():
                   'email':args.email[0], 'description':args.description[0],
                   'submit':'submit'}
     params = urllib.urlencode(raw_params)
+    print params
     request = urllib2.Request(page, params)
     page = urllib2.urlopen(request)
     page_list = page.read().split("\n")
