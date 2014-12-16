@@ -13,14 +13,25 @@ def get_results(status_page_list, description):
     for status_line in status_page_list:
         if '_summary' in status_line:
             temp = status_line.split(">")
+            make_dir = 'mkdir ' + description
+            os.system(make_dir)
+            time.sleep(60)
             for tag in temp:
                 if 'http:' in tag:
                     outfile = tag.split("/")[-1].split("\"")[0]
-                    #TODO:Check if directory exists before mkdir
-                    make_dir = 'mkdir ' + description
-                    os.system(make_dir)
                     outfile = description+'/'+ outfile
                     command = 'curl ' + tag.split("\"")[1] + ' -o ' + outfile
+                    available = False
+                    while not available:
+                        try:
+                            urllib2.urlopen(tag.split("\"")[1])
+                            print 'Available'
+                            available = True
+                        except urllib2.HTTPError, e:
+                            print e
+                            print 'Oops, 404'
+                            time.sleep(30)
+                    #command = 'wget ' + tag.split("\"")[1]
                     os.system(command)
                     print command
 
@@ -128,15 +139,18 @@ def main():
     if args.downstream == None:
         args.downstream = 50
 
-    if (args.nearest != 'None' and not (args.input[0] != 'S' or
+    if (args.nearest != None and not (args.input[0] != 'S' or
       args.input[0] != 'R')):
         print 'Nearest genes can only be used with SNP or region input'
         sys.exit()
+    
+    if not(args.nearest):
+        args.nearest = ''
 
     page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
     raw_params = {'genome':args.genome, 'numberPermutations':args.permutations,
                   'CIcutoff':cutoff, 'regUp':args.upstream,
-                  'regDown':args.downstream, 'nearestgene':args.nearest,
+                  'regDown':args.downstream, #'nearestgene':args.nearest,
                   'snpListFile':'filename=""', 'snpList':snps,
                   'genesToSpecifyFile':'filename=""', 'plot':args.plot,
                   'plotP':args.color_plot, 'collapseCI':args.simplify_plot,
