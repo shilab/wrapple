@@ -130,9 +130,12 @@ def main():
     else:
         zoomed_genes = ''
 
-    #TODO: When file upload is working, check snpfile if exists
-    snp_file = open(filename, 'r')
-    snps = snp_file.read()
+    try:
+        snp_file = open(filename, 'r')
+        snps = snp_file.read()
+    except IOError, e:
+        print e.strerror + ': ' + filename
+        sys.exit()
 
     if args.upstream == None:
         args.upstream = 50
@@ -150,7 +153,7 @@ def main():
     page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
     raw_params = {'genome':args.genome, 'numberPermutations':args.permutations,
                   'CIcutoff':cutoff, 'regUp':args.upstream,
-                  'regDown':args.downstream, #'nearestgene':args.nearest,
+                  'regDown':args.downstream, 'nearestgene':args.nearest,
                   'snpListFile':'filename=""', 'snpList':snps,
                   'genesToSpecifyFile':'filename=""', 'plot':args.plot,
                   'plotP':args.color_plot, 'collapseCI':args.simplify_plot,
@@ -167,9 +170,12 @@ def main():
         if 'status' in line:
             link = line.split("<a href=")[1].split(">")[0]
 
-    print "The link to the status page and results is: " + link
-
-    check_status(link, args.wait, args.description[0])
+    try:
+        print "The link to the status page and results is: " + link
+        check_status(link, args.wait, args.description[0])
+    except:
+        print 'You have exceeded DAPPLE\'s use limit. Wait a bit, and resubmit.'
+        sys.exit()
 
 if __name__ == "__main__":
     main()
