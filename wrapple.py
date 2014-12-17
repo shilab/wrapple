@@ -55,6 +55,28 @@ def check_status(link, wait, description):
                 time.sleep(wait*60)
                 return check_status(link, wait, description)
 
+def check_args(genome, cutoff, nearest, input_type):
+    """Check for mistakes in arguments that are fatal"""
+    if genome != '19' and genome != '18' and genome != '1kg':
+        print genome + ' is not a valid genome option.'
+        sys.exit()
+
+    if cutoff < 2 or cutoff > 10:
+        print 'CI Cutoff needs to be between 2 and 10'
+        sys.exit()
+ 
+    if (nearest != None and not (input_type[0] == 'S' or
+      input_type[0] == 'R')):
+        print 'Nearest genes can only be used with SNP or region input'
+        sys.exit()
+
+
+def change_true(arg):
+    """Change True to true for request headers"""
+    if arg == True:
+        arg = 'true'
+    return arg
+
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(formatter_class=
@@ -103,25 +125,12 @@ def main():
     filename = args.snpfile[0]
     cutoff = int(args.ci_cutoff)
 
-    if args.genome != '19' and args.genome != '18' and args.genome != '1kg':
-        print args.genome + ' is not a valid genome option.'
-        sys.exit()
+    check_args(args.genome, cutoff, args.nearest, args.input)
 
-    if cutoff < 2 or cutoff > 10:
-        print 'CI Cutoff needs to be between 2 and 10'
-        sys.exit()
-
-    if args.plot == True:
-        args.plot = 'true'
-
-    if args.simplify_plot == True:
-        args.simplify_plot = 'true'
-
-    if args.color_plot == True:
-        args.color_plot = 'true'
-
-    if args.nearest == True:
-        args.nearest = 'true'
+    args.plot = change_true(args.plot)
+    args.simplify_plot = change_true(args.simplify_plot)
+    args.color_plot = change_true(args.color_plot)
+    args.nearest = change_true(args.nearest)
 
     if args.zoom_to_gene != None:
         zoomed_genes = open(args.zoom_to_gene, 'r').read()
@@ -142,11 +151,6 @@ def main():
     if args.downstream == None:
         args.downstream = 50
 
-    if (args.nearest != None and not (args.input[0] != 'S' or
-      args.input[0] != 'R')):
-        print 'Nearest genes can only be used with SNP or region input'
-        sys.exit()
-
     if not args.nearest:
         args.nearest = ''
 
@@ -165,10 +169,10 @@ def main():
     request = urllib2.Request(page, params)
     try:
         page = urllib2.urlopen(request)
+        page_list = page.read().split("\n")
     except urllib2.URLError:
         print 'Check your network connection'
         sys.exit()
-    page_list = page.read().split("\n")
 
     for line in page_list:
         if 'status' in line:
