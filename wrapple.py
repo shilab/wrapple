@@ -64,7 +64,7 @@ def check_args(genome, cutoff, nearest, input_type):
     if cutoff < 2 or cutoff > 10:
         print 'CI Cutoff needs to be between 2 and 10'
         sys.exit()
- 
+
     if (nearest != None and not (input_type[0] == 'S' or
       input_type[0] == 'R')):
         print 'Nearest genes can only be used with SNP or region input'
@@ -78,9 +78,21 @@ def change_true(arg):
     return arg
 
 def check_regulatory(region):
+    """Set upstream/downstream to 50 if not set by user"""
     if region == None:
         region = 50
     return region
+
+def get_zoomed_genes(zoomed):
+    """Get the list of zoomed genes"""
+    if zoomed != None:
+        zoomed_genes = open(zoomed, 'r').read()
+        zoomed_genes = zoomed_genes.rstrip()
+        zoomed_genes = zoomed_genes.replace('\n', ',')
+    else:
+        zoomed_genes = ''
+    return zoomed_genes
+
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(formatter_class=
@@ -136,12 +148,7 @@ def main():
     args.color_plot = change_true(args.color_plot)
     args.nearest = change_true(args.nearest)
 
-    if args.zoom_to_gene != None:
-        zoomed_genes = open(args.zoom_to_gene, 'r').read()
-        zoomed_genes = zoomed_genes.rstrip()
-        zoomed_genes = zoomed_genes.replace('\n', ',')
-    else:
-        zoomed_genes = ''
+    zoomed_genes = get_zoomed_genes(args.zoom_to_gene)
 
     try:
         snp_file = open(filename, 'r')
