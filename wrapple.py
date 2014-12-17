@@ -77,6 +77,10 @@ def change_true(arg):
         arg = 'true'
     return arg
 
+def check_regulatory(region):
+    if region == None:
+        region = 50
+    return region
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(formatter_class=
@@ -146,10 +150,8 @@ def main():
         print err.strerror + ': ' + filename
         sys.exit()
 
-    if args.upstream == None:
-        args.upstream = 50
-    if args.downstream == None:
-        args.downstream = 50
+    args.upstream = check_regulatory(args.upstream)
+    args.downstream = check_regulatory(args.downstream)
 
     if not args.nearest:
         args.nearest = ''
