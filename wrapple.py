@@ -27,8 +27,8 @@ def get_results(status_page_list, description):
                             urllib2.urlopen(tag.split("\"")[1])
                             print 'Available'
                             available = True
-                        except urllib2.HTTPError, e:
-                            print e
+                        except urllib2.HTTPError, err:
+                            print err
                             print 'Oops, 404'
                             time.sleep(30)
                     #command = 'wget ' + tag.split("\"")[1]
@@ -41,7 +41,7 @@ def check_status(link, wait, description):
     try:
         status_page = urllib2.urlopen(link)
         status_page_list = status_page.read().split("\n")
-    except:
+    except urllib2.URLError:
         time.sleep(wait*60)
         return check_status(link, wait, description)
 
@@ -133,8 +133,8 @@ def main():
     try:
         snp_file = open(filename, 'r')
         snps = snp_file.read()
-    except IOError, e:
-        print e.strerror + ': ' + filename
+    except IOError as err:
+        print err.strerror + ': ' + filename
         sys.exit()
 
     if args.upstream == None:
@@ -146,8 +146,8 @@ def main():
       args.input[0] != 'R')):
         print 'Nearest genes can only be used with SNP or region input'
         sys.exit()
-    
-    if not(args.nearest):
+
+    if not args.nearest:
         args.nearest = ''
 
     page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
@@ -163,7 +163,11 @@ def main():
     params = urllib.urlencode(raw_params)
     print params
     request = urllib2.Request(page, params)
-    page = urllib2.urlopen(request)
+    try:
+        page = urllib2.urlopen(request)
+    except urllib2.URLError:
+        print 'Check your network connection'
+        sys.exit()
     page_list = page.read().split("\n")
 
     for line in page_list:
@@ -173,7 +177,7 @@ def main():
     try:
         print "The link to the status page and results is: " + link
         check_status(link, args.wait, args.description[0])
-    except:
+    except UnboundLocalError:
         print 'You have exceeded DAPPLE\'s use limit. Wait a bit, and resubmit.'
         sys.exit()
 
