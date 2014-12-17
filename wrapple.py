@@ -82,18 +82,16 @@ def change_true(arg):
         arg = 'true'
     return arg
 
-def check_regulatory(region):
-    """Set upstream/downstream to 50 if not set by user"""
-    if region == None:
-        region = 50
-    return region
-
 def get_zoomed_genes(zoomed):
     """Get the list of zoomed genes"""
     if zoomed != None:
-        zoomed_genes = open(zoomed, 'r').read()
-        zoomed_genes = zoomed_genes.rstrip()
-        zoomed_genes = zoomed_genes.replace('\n', ',')
+        try:
+            zoomed_genes = open(zoomed, 'r').read()
+            zoomed_genes = zoomed_genes.rstrip()
+            zoomed_genes = zoomed_genes.replace('\n', ',')
+        except IOError as err:
+            print err.strerror + ': ' + zoomed
+            sys.exit()
     else:
         zoomed_genes = ''
     return zoomed_genes
@@ -101,8 +99,12 @@ def get_zoomed_genes(zoomed):
 def get_specified_genes(specified):
     """Get the list of specified genes"""
     if specified != None:
-        specified_genes = open(specified, 'r').read()
-        specified_genes = specified_genes.rstrip()
+        try:
+            specified_genes = open(specified, 'r').read()
+            specified_genes = specified_genes.rstrip()
+        except IOError as err:
+            print err.strerror + ': ' + specified
+            sys.exit()
     else:
         specified_genes = ''
     return specified_genes
@@ -160,10 +162,10 @@ def main():
                         +'of input.S: SNP\nR: Region\nC: Combination\n'+
                         'GR: Gene-Region\nG: Gene\nDefault is Gene',
                         default='G')
-    parser.add_argument('-us', '--upstream', nargs='?',
+    parser.add_argument('-us', '--upstream', nargs='?', default=50,
                         help='Define gene regulatory region. Can only be '
                         + 'used with SNP and region input. In kb')
-    parser.add_argument('-ds', '--downstream', nargs='?',
+    parser.add_argument('-ds', '--downstream', nargs='?', default = 50,
                         help='Define gene regulatory region. Can only be '
                         + 'with SNP and region input. In kb')
     parser.add_argument('-n', '--nearest', action='store_true',
@@ -199,9 +201,6 @@ def main():
     snps = get_snps(filename)
 
     specified_genes = get_specified_genes(args.gene_specified)
-
-    args.upstream = check_regulatory(args.upstream)
-    args.downstream = check_regulatory(args.downstream)
 
     if not args.nearest:
         args.nearest = ''
