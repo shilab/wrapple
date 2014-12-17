@@ -93,6 +93,15 @@ def get_zoomed_genes(zoomed):
         zoomed_genes = ''
     return zoomed_genes
 
+def get_snps(filename):
+    """Read snps from file"""
+    try:
+        snp_file = open(filename, 'r')
+        snps = snp_file.read()
+    except IOError as err:
+        print err.strerror + ': ' + filename
+        sys.exit()
+    return snps
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(formatter_class=
@@ -150,12 +159,7 @@ def main():
 
     zoomed_genes = get_zoomed_genes(args.zoom_to_gene)
 
-    try:
-        snp_file = open(filename, 'r')
-        snps = snp_file.read()
-    except IOError as err:
-        print err.strerror + ': ' + filename
-        sys.exit()
+    snps = get_snps(filename)
 
     args.upstream = check_regulatory(args.upstream)
     args.downstream = check_regulatory(args.downstream)
