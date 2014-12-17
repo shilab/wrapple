@@ -9,7 +9,7 @@ import sys
 #TODO: Try BeautifulSoup instead of the splits
 
 def get_results(status_page_list, description):
-    """Saves results when finished """
+    """Saves results when finished"""
     for status_line in status_page_list:
         if '_summary' in status_line:
             temp = status_line.split(">")
@@ -55,7 +55,7 @@ def check_status(link, wait, description):
                 time.sleep(wait*60)
                 return check_status(link, wait, description)
 
-def check_args(genome, cutoff, nearest, input_type):
+def check_args(genome, cutoff, nearest, specified, input_type):
     """Check for mistakes in arguments that are fatal"""
     if genome != '19' and genome != '18' and genome != '1kg':
         print genome + ' is not a valid genome option.'
@@ -67,11 +67,15 @@ def check_args(genome, cutoff, nearest, input_type):
 
     if (nearest == True and not (input_type[0] == 'S' or
       input_type[0] == 'R')):
-        print nearest
         print 'Nearest genes can only be used with SNP or region input'
         sys.exit()
 
+    if specified != None and input_type[0] == 'G':
+        print 'Specified genes can\'t be used with gene input'
+        sys.exit()
 
+    else:
+        return
 def change_true(arg):
     """Change True to true for request headers"""
     if arg == True:
@@ -94,11 +98,21 @@ def get_zoomed_genes(zoomed):
         zoomed_genes = ''
     return zoomed_genes
 
+def get_specified_genes(specified):
+    """Get the list of specified genes"""
+    if specified != None:
+        specified_genes = open(specified, 'r').read()
+        specified_genes = specified_genes.rstrip()
+    else:
+        specified_genes = ''
+    return specified_genes
+
 def get_snps(filename):
     """Read snps from file"""
     try:
         snp_file = open(filename, 'r')
         snps = snp_file.read()
+        snps = snps.rstrip()
     except IOError as err:
         print err.strerror + ': ' + filename
         sys.exit()
@@ -134,7 +148,6 @@ def main():
                         help='Check status page every -w minutest.\n'
                         + 'Longer wait times suggested for larger datasets.\n'
                         'Default is 1 minute.')
-    #TODO: Add options
     parser.add_argument('-p', '--permutations', nargs='?', default=1000,
                         help='Number of permutations to run. Default is 1000')
     parser.add_argument('-g', '--genome', nargs='?', default='19',
@@ -156,6 +169,8 @@ def main():
     parser.add_argument('-n', '--nearest', action='store_true',
                         help='Use nearest gene for SNP input, instead of all '
                         + 'genes in the chosen region')
+    parser.add_argument('-gs', '--gene_specified', nargs='?',
+                        help='Genes to specify as causal')
     parser.add_argument('-pl', '--plot', help='Plot the network',
                         action='store_true')
     parser.add_argument('-cp', '--color_plot', help='Color plot by p-value',
@@ -171,7 +186,8 @@ def main():
     filename = args.snpfile[0]
     cutoff = int(args.ci_cutoff)
 
-    check_args(args.genome, cutoff, args.nearest, args.input)
+    check_args(args.genome, cutoff, args.nearest, args.gene_specified,
+               args.input)
 
     args.plot = change_true(args.plot)
     args.simplify_plot = change_true(args.simplify_plot)
@@ -181,6 +197,8 @@ def main():
     zoomed_genes = get_zoomed_genes(args.zoom_to_gene)
 
     snps = get_snps(filename)
+
+    specified_genes = get_specified_genes(args.gene_specified)
 
     args.upstream = check_regulatory(args.upstream)
     args.downstream = check_regulatory(args.downstream)
@@ -193,15 +211,15 @@ def main():
                   'CIcutoff':cutoff, 'regUp':args.upstream,
                   'regDown':args.downstream, 'nearestgene':args.nearest,
                   'snpListFile':'filename=""', 'snpList':snps,
-                  'genesToSpecifyFile':'filename=""', 'plot':args.plot,
+                  'genesToSpecify':specified_genes, 'plot':args.plot,
                   'plotP':args.color_plot, 'collapseCI':args.simplify_plot,
-                  'genesToSpecify':'', 'zoomedGenes':zoomed_genes,
-                  'email':args.email[0], 'description':args.description[0],
-                  'submit':'submit'}
+                  'zoomedGenes':zoomed_genes, 'email':args.email[0],
+                  'description':args.description[0], 'submit':'submit'}
     params = urllib.urlencode(raw_params)
     print params
     request = urllib2.Request(page, params)
 
     send_parameters(request, args.wait, args.description[0])
+
 if __name__ == "__main__":
     main()
