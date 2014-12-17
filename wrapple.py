@@ -65,8 +65,9 @@ def check_args(genome, cutoff, nearest, input_type):
         print 'CI Cutoff needs to be between 2 and 10'
         sys.exit()
 
-    if (nearest != None and not (input_type[0] == 'S' or
+    if (nearest == True and not (input_type[0] == 'S' or
       input_type[0] == 'R')):
+        print nearest
         print 'Nearest genes can only be used with SNP or region input'
         sys.exit()
 
@@ -102,6 +103,26 @@ def get_snps(filename):
         print err.strerror + ': ' + filename
         sys.exit()
     return snps
+
+def send_parameters(request, wait, description):
+    """Sends all the parameters to DAPPLE, starts the job"""
+    try:
+        page = urllib2.urlopen(request)
+        page_list = page.read().split("\n")
+    except urllib2.URLError:
+        print 'Check your network connection'
+        sys.exit()
+
+    for line in page_list:
+        if 'status' in line:
+            link = line.split("<a href=")[1].split(">")[0]
+
+    try:
+        print "The link to the status page and results is: " + link
+        check_status(link, wait, description)
+    except UnboundLocalError:
+        print 'You have exceeded DAPPLE\'s use limit. Wait a bit, and resubmit.'
+        sys.exit()
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(formatter_class=
@@ -180,23 +201,7 @@ def main():
     params = urllib.urlencode(raw_params)
     print params
     request = urllib2.Request(page, params)
-    try:
-        page = urllib2.urlopen(request)
-        page_list = page.read().split("\n")
-    except urllib2.URLError:
-        print 'Check your network connection'
-        sys.exit()
 
-    for line in page_list:
-        if 'status' in line:
-            link = line.split("<a href=")[1].split(">")[0]
-
-    try:
-        print "The link to the status page and results is: " + link
-        check_status(link, args.wait, args.description[0])
-    except UnboundLocalError:
-        print 'You have exceeded DAPPLE\'s use limit. Wait a bit, and resubmit.'
-        sys.exit()
-
+    send_parameters(request, args.wait, args.description[0])
 if __name__ == "__main__":
     main()
