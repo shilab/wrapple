@@ -8,6 +8,52 @@ import sys
 
 #TODO: Try BeautifulSoup instead of the splits
 
+def create_parser():
+    parser = argparse.ArgumentParser(formatter_class=
+                                     argparse.RawTextHelpFormatter)
+    parser.add_argument('-e', '--email', nargs=1)
+    parser.add_argument('-d', '--description', nargs=1)
+    parser.add_argument('-f', '--snpfile', nargs=1)
+    parser.add_argument('-w', '--wait', nargs='?', default=1,
+                        help='Check status page every -w minutest.\n'
+                        + 'Longer wait times suggested for larger datasets.\n'
+                        'Default is 1 minute.')
+    parser.add_argument('-p', '--permutations', nargs='?', default=1000,
+                        help='Number of permutations to run. Default is 1000')
+    parser.add_argument('-g', '--genome', nargs='?', default='19',
+                        help='Genome Assembly Options:\n19: Hg19/HapMap\n'
+                        + '18: Hg18/HapMap\n1kg: Hg19/1000Genomes SNPs')
+    parser.add_argument('-c', '--ci_cutoff', nargs='?', default=2,
+                        help='Common Interactor Binding Degree Cuttoff:\n'
+                        +'Options:2-10\nDefault:2')
+    parser.add_argument('-i', '--input', nargs=1, help='Specify the type '
+                        +'of input.S: SNP\nR: Region\nC: Combination\n'+
+                        'GR: Gene-Region\nG: Gene\nDefault is Gene',
+                        default='G')
+    parser.add_argument('-us', '--upstream', nargs='?', default=50,
+                        help='Define gene regulatory region. Can only be '
+                        + 'used with SNP and region input. In kb')
+    parser.add_argument('-ds', '--downstream', nargs='?', default=50,
+                        help='Define gene regulatory region. Can only be '
+                        + 'with SNP and region input. In kb')
+    parser.add_argument('-n', '--nearest', action='store_true',
+                        help='Use nearest gene for SNP input, instead of all '
+                        + 'genes in the chosen region')
+    parser.add_argument('-gs', '--gene_specified', nargs='?',
+                        help='Genes to specify as causal')
+    parser.add_argument('-pl', '--plot', help='Plot the network',
+                        action='store_true')
+    parser.add_argument('-cp', '--color_plot', help='Color plot by p-value',
+                        action='store_true')
+    parser.add_argument('-s', '--simplify_plot', help='Simplify plot',
+                        action='store_true')
+    parser.add_argument('-z', '--zoom_to_gene',
+                        help='Create a subplot with only the genes specified')
+    parser.add_argument('-v', '--version', action='version',
+                        version='%(prog)s ' + __version__)
+
+    return parser
+
 def get_results(status_page_list, description):
     """Saves results when finished"""
     for status_line in status_page_list:
@@ -141,48 +187,49 @@ def send_parameters(request, wait, description):
 
 def main():
     """Main function"""
-    parser = argparse.ArgumentParser(formatter_class=
-                                     argparse.RawTextHelpFormatter)
-    parser.add_argument('-e', '--email', nargs=1)
-    parser.add_argument('-d', '--description', nargs=1)
-    parser.add_argument('-f', '--snpfile', nargs=1)
-    parser.add_argument('-w', '--wait', nargs='?', default=1,
-                        help='Check status page every -w minutest.\n'
-                        + 'Longer wait times suggested for larger datasets.\n'
-                        'Default is 1 minute.')
-    parser.add_argument('-p', '--permutations', nargs='?', default=1000,
-                        help='Number of permutations to run. Default is 1000')
-    parser.add_argument('-g', '--genome', nargs='?', default='19',
-                        help='Genome Assembly Options:\n19: Hg19/HapMap\n'
-                        + '18: Hg18/HapMap\n1kg: Hg19/1000Genomes SNPs')
-    parser.add_argument('-c', '--ci_cutoff', nargs='?', default=2,
-                        help='Common Interactor Binding Degree Cuttoff:\n'
-                        +'Options:2-10\nDefault:2')
-    parser.add_argument('-i', '--input', nargs=1, help='Specify the type '
-                        +'of input.S: SNP\nR: Region\nC: Combination\n'+
-                        'GR: Gene-Region\nG: Gene\nDefault is Gene',
-                        default='G')
-    parser.add_argument('-us', '--upstream', nargs='?', default=50,
-                        help='Define gene regulatory region. Can only be '
-                        + 'used with SNP and region input. In kb')
-    parser.add_argument('-ds', '--downstream', nargs='?', default = 50,
-                        help='Define gene regulatory region. Can only be '
-                        + 'with SNP and region input. In kb')
-    parser.add_argument('-n', '--nearest', action='store_true',
-                        help='Use nearest gene for SNP input, instead of all '
-                        + 'genes in the chosen region')
-    parser.add_argument('-gs', '--gene_specified', nargs='?',
-                        help='Genes to specify as causal')
-    parser.add_argument('-pl', '--plot', help='Plot the network',
-                        action='store_true')
-    parser.add_argument('-cp', '--color_plot', help='Color plot by p-value',
-                        action='store_true')
-    parser.add_argument('-s', '--simplify_plot', help='Simplify plot',
-                        action='store_true')
-    parser.add_argument('-z', '--zoom_to_gene',
-                        help='Create a subplot with only the genes specified')
-    parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s ' + __version__)
+#    parser = argparse.ArgumentParser(formatter_class=
+#                                     argparse.RawTextHelpFormatter)
+#    parser.add_argument('-e', '--email', nargs=1)
+#    parser.add_argument('-d', '--description', nargs=1)
+#    parser.add_argument('-f', '--snpfile', nargs=1)
+#    parser.add_argument('-w', '--wait', nargs='?', default=1,
+#                        help='Check status page every -w minutest.\n'
+#                        + 'Longer wait times suggested for larger datasets.\n'
+#                        'Default is 1 minute.')
+#    parser.add_argument('-p', '--permutations', nargs='?', default=1000,
+#                        help='Number of permutations to run. Default is 1000')
+#    parser.add_argument('-g', '--genome', nargs='?', default='19',
+#                        help='Genome Assembly Options:\n19: Hg19/HapMap\n'
+#                        + '18: Hg18/HapMap\n1kg: Hg19/1000Genomes SNPs')
+#    parser.add_argument('-c', '--ci_cutoff', nargs='?', default=2,
+#                        help='Common Interactor Binding Degree Cuttoff:\n'
+#                        +'Options:2-10\nDefault:2')
+#    parser.add_argument('-i', '--input', nargs=1, help='Specify the type '
+#                        +'of input.S: SNP\nR: Region\nC: Combination\n'+
+#                        'GR: Gene-Region\nG: Gene\nDefault is Gene',
+#                        default='G')
+#    parser.add_argument('-us', '--upstream', nargs='?', default=50,
+#                        help='Define gene regulatory region. Can only be '
+#                        + 'used with SNP and region input. In kb')
+#    parser.add_argument('-ds', '--downstream', nargs='?', default = 50,
+#                        help='Define gene regulatory region. Can only be '
+#                        + 'with SNP and region input. In kb')
+#    parser.add_argument('-n', '--nearest', action='store_true',
+#                        help='Use nearest gene for SNP input, instead of all '
+#                        + 'genes in the chosen region')
+#    parser.add_argument('-gs', '--gene_specified', nargs='?',
+#                        help='Genes to specify as causal')
+#    parser.add_argument('-pl', '--plot', help='Plot the network',
+#                        action='store_true')
+#    parser.add_argument('-cp', '--color_plot', help='Color plot by p-value',
+#                        action='store_true')
+#    parser.add_argument('-s', '--simplify_plot', help='Simplify plot',
+#                        action='store_true')
+#    parser.add_argument('-z', '--zoom_to_gene',
+#                        help='Create a subplot with only the genes specified')
+#    parser.add_argument('-v', '--version', action='version',
+#                        version='%(prog)s ' + __version__)
+    parser = create_parser()
     args = parser.parse_args()
 
     filename = args.snpfile[0]
