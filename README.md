@@ -1,5 +1,6 @@
 wrapple
 =======
 ##A Python wrapper for DAPPLE  
-[![Build Status](https://travis-ci.org/shilab/wrapple.svg?branch=master)](https://travis-ci.org/shilab/wrapple)
-Currently version is semi-functional. Works for our past uses. Next steps are to implement all options from DAPPLE to make it 100% functional.
+[![Build Status](https://travis-ci.org/shilab/wrapple.svg?branch=master)](https://travis-ci.org/shilab/wrapple)  
+
+wrapple is a command line wrapper for [DAPPLE](http://www.broadinstitute.org/mpg/dapple/dappleTMP.php#). The current version has all the options from the web interface. wrapple is still under development, so some bugs need to be found. If you find a bug, open an issue. 
