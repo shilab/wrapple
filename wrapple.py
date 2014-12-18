@@ -55,7 +55,11 @@ def create_parser():
     return parser
 
 def create_request(args):
-    filename = args.snpfile[0]
+    if args.snpfile != None:
+        filename = args.snpfile[0]
+    else:
+        print 'You need to supply a input file'
+        sys.exit()
     cutoff = int(args.ci_cutoff)
 
     check_args(args.genome, cutoff, args.nearest, args.gene_specified,
