@@ -65,6 +65,10 @@ def create_request(args):
         print 'You need to provide a description'
         sys.exit()
 
+    if args.email == None:
+        print 'You need to provide an email'
+        sys.exit()
+
     cutoff = int(args.ci_cutoff)
 
     check_args(args.genome, cutoff, args.nearest, args.gene_specified,
