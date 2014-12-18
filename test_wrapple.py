@@ -1,5 +1,6 @@
 from wrapple import *
 from nose.tools import raises
+from unittest import TestCase
 
 def test_change_true_1():
     assert change_true(True) == 'true'
@@ -46,3 +47,28 @@ def test_get_specified_genes_2():
 @raises(SystemExit)
 def test_get_specified_genes_3():
      get_specified_genes('not_a_specified_file')
+
+@raises(SystemExit)
+def test_create_request_1():
+    parser = create_parser()
+    args = parser.parse_args([])
+    create_request(args)
+
+@raises(SystemExit)
+def test_create_request_2():
+    parser = create_parser()
+    args = parser.parse_args(['-f', 'snps'])
+    create_request(args)
+
+@raises(SystemExit)
+def test_create_request_3():
+    parser = create_parser()
+    args = parser.parse_args(['-f', 'snps', '-d', 'description'])
+    create_request(args)
+
+#def test_create_request_4():
+#    parser = create_parser()
+#    args = parser.parse_args(['-f', 'snps', '-d', 'description', '-e', 'test@test']) 
+#    request = create_request(args)
+#    assert request == None
+    
