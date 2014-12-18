@@ -31,10 +31,8 @@ def get_results(status_page_list, description):
                             print err
                             print 'Oops, 404'
                             time.sleep(30)
-                    #command = 'wget ' + tag.split("\"")[1]
                     os.system(command)
                     print command
-
 
 def check_status(link, wait, description):
     """Updates status of run"""
@@ -76,6 +74,7 @@ def check_args(genome, cutoff, nearest, specified, input_type):
 
     else:
         return
+
 def change_true(arg):
     """Change True to true for request headers"""
     if arg == True:
@@ -135,10 +134,11 @@ def send_parameters(request, wait, description):
 
     try:
         print "The link to the status page and results is: " + link
-        check_status(link, wait, description)
+        return check_status(link, wait, description)
     except UnboundLocalError:
         print 'You have exceeded DAPPLE\'s use limit. Wait a bit, and resubmit.'
         sys.exit()
+
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(formatter_class=
@@ -218,7 +218,7 @@ def main():
     print params
     request = urllib2.Request(page, params)
 
-    send_parameters(request, args.wait, args.description[0])
+    return send_parameters(request, args.wait, args.description[0])
 
 if __name__ == "__main__":
     main()
