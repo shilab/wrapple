@@ -1,6 +1,6 @@
 from wrapple import *
 from nose.tools import raises
-from unittest import TestCase
+from mock import patch
 
 def test_change_true_1():
     assert change_true(True) == 'true'
@@ -66,9 +66,15 @@ def test_create_request_3():
     args = parser.parse_args(['-f', 'snps', '-d', 'description'])
     create_request(args)
 
-#def test_create_request_4():
-#    parser = create_parser()
-#    args = parser.parse_args(['-f', 'snps', '-d', 'description', '-e', 'test@test']) 
-#    request = create_request(args)
-#    assert request == None
-    
+
+def fake_urlopen(url):
+    url_file = open(url, 'r')
+    return url_file
+
+patcher = patch('urllib2.urlopen', fake_urlopen)
+patcher.start()
+
+def test_send_request_1():
+    status_page = urllib2.urlopen('snps')
+    status_page_list = status_page.read().split("\n")
+    assert status_page_list == ['rs3890745', 'rs2240340', 'rs2476601', '']
