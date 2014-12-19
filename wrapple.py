@@ -88,7 +88,7 @@ def create_request(args):
     if not args.nearest:
         args.nearest = ''
 
-    page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
+#    page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
     raw_params = {'genome':args.genome, 'numberPermutations':args.permutations,
                   'CIcutoff':cutoff, 'regUp':args.upstream,
                   'regDown':args.downstream, 'nearestgene':args.nearest,
@@ -99,10 +99,9 @@ def create_request(args):
                   'description':args.description[0], 'submit':'submit'}
     params = urllib.urlencode(raw_params)
     print params
-    request = urllib2.Request(page, params)
-
+#    request = urllib2.Request(page, params)
 #    return send_parameters(request, args.wait, args.description[0])
-    return (request, args.wait, args.description[0])
+    return (params, args.wait, args.description[0])
 
 def get_results(link, description):
     """Saves results when finished"""
@@ -252,7 +251,9 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    request, wait, description = create_request(args)
+    page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
+    params, wait, description = create_request(args)
+    request = urllib2.Request(page, params)
 
     link, wait, description = send_parameters(request, wait, description)
 
