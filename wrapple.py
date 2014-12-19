@@ -101,10 +101,18 @@ def create_request(args):
     print params
     request = urllib2.Request(page, params)
 
-    return send_parameters(request, args.wait, args.description[0])
+#    return send_parameters(request, args.wait, args.description[0])
+    return (request, args.wait, args.description[0])
 
-def get_results(status_page_list, description):
+def get_results(link, description):
     """Saves results when finished"""
+    try:
+        status_page = urllib2.urlopen(link)
+        status_page_list = status_page.read().split("\n")
+    except urllib2.URLError:
+        time.sleep(wait*60)
+        get_results(link, description)
+
     for status_line in status_page_list:
         if '_summary' in status_line:
             temp = status_line.split(">")
@@ -136,17 +144,20 @@ def check_status(link, wait, description):
         status_page_list = status_page.read().split("\n")
     except urllib2.URLError:
         time.sleep(wait*60)
-        return check_status(link, wait, description)
+#        return check_status(link, wait, description)
+        return False
 
     for page_line in status_page_list:
         if 'status' in page_line:
             tag = page_line.split("<BR>")
             print tag[2] + "\t" + tag[3].split("<a href")[0]
             if 'FINISHED' in tag[2]:
-                get_results(status_page_list, description)
+                #get_results(status_page_list, description)
+                return True
             else:
                 time.sleep(wait*60)
-                return check_status(link, wait, description)
+                #return check_status(link, wait, description)
+                return False
 
 def check_args(genome, cutoff, nearest, specified, input_type):
     """Check for mistakes in arguments that are fatal"""
@@ -229,7 +240,8 @@ def send_parameters(request, wait, description):
 
     try:
         print "The link to the status page and results is: " + link
-        return check_status(link, wait, description)
+        #return check_status(link, wait, description)
+        return (link, wait, description)
     except UnboundLocalError:
         print 'You have exceeded DAPPLE\'s use limit. Wait a bit, and resubmit.'
         sys.exit()
@@ -239,7 +251,16 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    return create_request(args)
+    request, wait, description = create_request(args)
 
+    link, wait, description = send_parameters(request, wait, description)
+
+    done = check_status(link, wait, description) 
+    while done == False:
+        done = check_status(link, wait, description)
+
+    print done
+    get_results(link, description)
+    
 if __name__ == "__main__":
     main()
