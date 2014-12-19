@@ -111,7 +111,8 @@ def get_results(link, description):
         status_page_list = status_page.read().split("\n")
     except urllib2.URLError:
         time.sleep(wait*60)
-        get_results(link, description)
+#        get_results(link, description)
+        return False
 
     for status_line in status_page_list:
         if '_summary' in status_line:
@@ -136,7 +137,7 @@ def get_results(link, description):
                             time.sleep(30)
                     os.system(command)
                     print command
-
+    return
 def check_status(link, wait, description):
     """Updates status of run"""
     try:
@@ -259,8 +260,9 @@ def main():
     while done == False:
         done = check_status(link, wait, description)
 
-    print done
-    get_results(link, description)
+    results_avail = get_results(link, description)
+    while results_avail == False:
+        results_avail = get_results(link, description)
     
 if __name__ == "__main__":
     main()
