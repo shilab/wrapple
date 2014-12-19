@@ -1,6 +1,7 @@
 from wrapple import *
 from nose.tools import raises
 from mock import patch
+import unittest
 
 def test_change_true_1():
     assert change_true(True) == 'true'
@@ -66,15 +67,44 @@ def test_create_request_3():
     args = parser.parse_args(['-f', 'snps', '-d', 'description'])
     create_request(args)
 
+def test_create_request_4():
+    parser = create_parser()
+    args = parser.parse_args(['-f', 'snps', '-d', 'description', '-e', 'test@test'])
+    params, wait , description = create_request(args)
+    assert params == 'plot=False&zoomedGenes=&description=description&numberPermutations=1000&snpListFile=filename%3D%22%22&nearestgene=&CIcutoff=2&regDown=50&email=test%40test&submit=submit&genome=19&regUp=50&snpList=rs3890745%0Ars2240340%0Ars2476601&collapseCI=False&plotP=False&genesToSpecify='
 
-def fake_urlopen(url):
-    url_file = open(url, 'r')
+def fail_urlopen(url):
+    url_file = open('fail.html','r')
     return url_file
 
-patcher = patch('urllib2.urlopen', fake_urlopen)
-patcher.start()
+def status_urlopen(url):
+    url_file = open('status.html','r')
+    return url_file
 
-def test_send_request_1():
-    status_page = urllib2.urlopen('snps')
-    status_page_list = status_page.read().split("\n")
-    assert status_page_list == ['rs3890745', 'rs2240340', 'rs2476601', '']
+class send_fail(unittest.TestCase):
+
+    def setUp(self):
+        self.patcher = patch('urllib2.urlopen', fail_urlopen)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    @raises(SystemExit)
+    def test_send_request_2(self):
+        request = ''
+        link, wait, description = send_parameters(request, 1, 'description')
+
+class send_success(unittest.TestCase):
+    
+    def setUp(self):
+        self.patcher = patch('urllib2.urlopen', status_urlopen)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_send_request_3(self):
+        request = ''
+        link, wait, description = send_parameters(request, 1, 'description')
+        assert link == 'http://www.broadinstitute.org/mpg/dapple/statusTMP.php?jid=1418998161'
