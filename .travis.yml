@@ -3,6 +3,6 @@ language: python
 install:
     pip install coveralls
 
-script: nosetests
+script: nosetests --with-coverage --cover-package wrapple -v
 
 after-success: coveralls
