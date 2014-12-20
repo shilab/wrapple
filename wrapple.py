@@ -143,7 +143,7 @@ def check_status(link, wait, description):
         status_page = urllib2.urlopen(link)
         status_page_list = status_page.read().split("\n")
     except urllib2.URLError:
-        time.sleep(wait*60)
+        #time.sleep(wait*60)
 #        return check_status(link, wait, description)
         return False
 
@@ -155,7 +155,7 @@ def check_status(link, wait, description):
                 #get_results(status_page_list, description)
                 return True
             else:
-                time.sleep(wait*60)
+                #time.sleep(wait*60)
                 #return check_status(link, wait, description)
                 return False
 
@@ -259,6 +259,7 @@ def main():
 
     done = check_status(link, wait, description) 
     while done == False:
+        time.sleep(wait*60)    
         done = check_status(link, wait, description)
 
     results_avail = get_results(link, description)
