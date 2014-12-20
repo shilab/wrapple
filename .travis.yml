@@ -1,8 +1,10 @@
 language: python
 
 install:
-    pip install python-coveralls
+    - pip install coveralls
 
-script: nosetests --with-coverage --cover-package wrapple -v
+script: 
+    - nosetests --with-coverage --cover-package wrapple -v
 
-after-success: coveralls
+after-success:
+    - coveralls
