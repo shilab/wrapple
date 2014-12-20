@@ -109,6 +109,22 @@ class SendSuccess(unittest.TestCase):
         link, _, _ = send_parameters(request, 1, 'description')
         assert link == 'http://www.broadinstitute.org/mpg/dapple/statusTMP.php?jid=1418998161'
 
+def send_exception_urlopen(url):
+    raise urllib2.URLError('no host given')
+
+class SendException(unittest.TestCase):
+    def setUp(self):
+        self.patcher = patch('urllib2.urlopen', send_exception_urlopen)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+    
+    @raises(SystemExit)
+    def test_send_request_4(self):
+        request = ''
+        _, _, _ = send_parameters(request, 1, 'description')
+
 def finished_urlopen(url):
     url_file = open('finished.html', 'r')
     return url_file
