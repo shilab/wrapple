@@ -109,7 +109,7 @@ def get_results(link, description):
         status_page = urllib2.urlopen(link)
         status_page_list = status_page.read().split("\n")
     except urllib2.URLError:
-        time.sleep(wait*60)
+        #time.sleep(wait*60)
 #        get_results(link, description)
         return False
 
@@ -128,14 +128,13 @@ def get_results(link, description):
                     while not available:
                         try:
                             urllib2.urlopen(tag.split("\"")[1])
-                            print 'Available'
                             available = True
                         except urllib2.HTTPError, err:
                             print err
                             print 'Oops, 404'
                             time.sleep(30)
                     os.system(command)
-                    print command
+                    #print command
     return
 def check_status(link, wait, description):
     """Updates status of run"""
@@ -264,6 +263,7 @@ def main():
 
     results_avail = get_results(link, description)
     while results_avail == False:
+        time.sleep(wait*60)
         results_avail = get_results(link, description)
     
 if __name__ == "__main__":
