@@ -47,7 +47,7 @@ def test_get_specified_genes_2():
     assert get_specified_genes('specified') == 'BRCA1\nBRCA2'
 @raises(SystemExit)
 def test_get_specified_genes_3():
-     get_specified_genes('not_a_specified_file')
+    get_specified_genes('not_a_specified_file')
 
 @raises(SystemExit)
 def test_create_request_1():
@@ -70,15 +70,15 @@ def test_create_request_3():
 def test_create_request_4():
     parser = create_parser()
     args = parser.parse_args(['-f', 'snps', '-d', 'description', '-e', 'test@test'])
-    params, wait , description = create_request(args)
+    params, _, _ = create_request(args)
     assert params == 'plot=False&zoomedGenes=&description=description&numberPermutations=1000&snpListFile=filename%3D%22%22&nearestgene=&CIcutoff=2&regDown=50&email=test%40test&submit=submit&genome=19&regUp=50&snpList=rs3890745%0Ars2240340%0Ars2476601&collapseCI=False&plotP=False&genesToSpecify='
 
 def fail_urlopen(url):
-    url_file = open('fail.html','r')
+    url_file = open('fail.html', 'r')
     return url_file
 
 def status_urlopen(url):
-    url_file = open('status.html','r')
+    url_file = open('status.html', 'r')
     return url_file
 
 class send_fail(unittest.TestCase):
@@ -93,7 +93,7 @@ class send_fail(unittest.TestCase):
     @raises(SystemExit)
     def test_send_request_2(self):
         request = ''
-        link, wait, description = send_parameters(request, 1, 'description')
+        _, _, _ = send_parameters(request, 1, 'description')
 
 class send_success(unittest.TestCase):
     
@@ -106,5 +106,51 @@ class send_success(unittest.TestCase):
 
     def test_send_request_3(self):
         request = ''
-        link, wait, description = send_parameters(request, 1, 'description')
+        link, _, _ = send_parameters(request, 1, 'description')
         assert link == 'http://www.broadinstitute.org/mpg/dapple/statusTMP.php?jid=1418998161'
+
+def finished_urlopen(url):
+    url_file = open('finished.html', 'r')
+    return url_file
+
+class status_finished(unittest.TestCase):
+
+    def setUp(self):
+        self.patcher = patch('urllib2.urlopen', finished_urlopen)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+        
+    def test_check_status(self):
+        assert check_status('link', 1, 'description') == True
+
+def run_urlopen(url):
+    url_file = open('run.html', 'r')
+    return url_file
+
+class status_run(unittest.TestCase):
+    def setUp(self):
+        self.patcher = patch('urllib2.urlopen', run_urlopen)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_check_status_2(self):
+        assert check_status('link', 1, 'description') == False
+
+def pend_urlopen(url):
+    url_file = open('pend.html', 'r')
+    return url_file
+
+class status_pend(unittest.TestCase):
+    def setUp(self):
+        self.patcher = patch('urllib2.urlopen', run_urlopen)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_check_status_3(self):
+        assert check_status('link', 1, 'description') == False
