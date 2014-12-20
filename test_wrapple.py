@@ -81,7 +81,7 @@ def status_urlopen(url):
     url_file = open('status.html', 'r')
     return url_file
 
-class send_fail(unittest.TestCase):
+class sendFail(unittest.TestCase):
 
     def setUp(self):
         self.patcher = patch('urllib2.urlopen', fail_urlopen)
@@ -95,7 +95,7 @@ class send_fail(unittest.TestCase):
         request = ''
         _, _, _ = send_parameters(request, 1, 'description')
 
-class send_success(unittest.TestCase):
+class SendSuccess(unittest.TestCase):
     
     def setUp(self):
         self.patcher = patch('urllib2.urlopen', status_urlopen)
@@ -113,7 +113,7 @@ def finished_urlopen(url):
     url_file = open('finished.html', 'r')
     return url_file
 
-class status_finished(unittest.TestCase):
+class StatusFinished(unittest.TestCase):
 
     def setUp(self):
         self.patcher = patch('urllib2.urlopen', finished_urlopen)
@@ -129,7 +129,7 @@ def run_urlopen(url):
     url_file = open('run.html', 'r')
     return url_file
 
-class status_run(unittest.TestCase):
+class StatusRun(unittest.TestCase):
     def setUp(self):
         self.patcher = patch('urllib2.urlopen', run_urlopen)
         self.patcher.start()
@@ -144,7 +144,7 @@ def pend_urlopen(url):
     url_file = open('pend.html', 'r')
     return url_file
 
-class status_pend(unittest.TestCase):
+class StatusPend(unittest.TestCase):
     def setUp(self):
         self.patcher = patch('urllib2.urlopen', run_urlopen)
         self.patcher.start()
@@ -153,4 +153,18 @@ class status_pend(unittest.TestCase):
         self.patcher.stop()
 
     def test_check_status_3(self):
+        assert check_status('link', 1, 'description') == False
+
+def raise_url_exception(url):
+    raise urllib2.URLError('no host given')
+
+class StatusException(unittest.TestCase):
+    def setUp(self):
+        self.patcher = patch('urllib2.urlopen', raise_url_exception)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_check_status_4(self):
         assert check_status('link', 1, 'description') == False
