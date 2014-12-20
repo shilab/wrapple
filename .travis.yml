@@ -2,7 +2,8 @@ language: python
 
 install:
     - pip install coveralls
-
+	- pip install nose
+	- pip install coverage
 script: 
     - nosetests --with-coverage --cover-package wrapple -v
 
