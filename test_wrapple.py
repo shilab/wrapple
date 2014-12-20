@@ -184,3 +184,15 @@ class StatusException(unittest.TestCase):
 
     def test_check_status_4(self):
         assert check_status('link', 1, 'description') == False
+
+
+class GetResultsException(unittest.TestCase):
+    def setUp(self):
+        self.patcher = patch('urllib2.urlopen', raise_url_exception)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_check_status_4(self):
+        assert get_results('link', 'description') == False
