@@ -111,14 +111,15 @@ def get_results(link, description):
     except urllib2.URLError:
         #time.sleep(wait*60)
 #        get_results(link, description)
-        return False
+        return (False, None)
 
     for status_line in status_page_list:
         if '_summary' in status_line:
             temp = status_line.split(">")
-            make_dir = 'mkdir ' + description
-            os.system(make_dir)
-            time.sleep(60)
+            #make_dir = 'mkdir ' + description
+            #os.system(make_dir)
+            #time.sleep(60)
+            commands = []
             for tag in temp:
                 if 'http:' in tag:
                     outfile = tag.split("/")[-1].split("\"")[0]
@@ -126,6 +127,7 @@ def get_results(link, description):
                     command = 'curl ' + tag.split("\"")[1] + ' -o ' + outfile
                     available = False
                     while not available:
+                        #TODO: Add try counter
                         try:
                             urllib2.urlopen(tag.split("\"")[1])
                             available = True
@@ -133,9 +135,11 @@ def get_results(link, description):
                             print err
                             print 'Oops, 404'
                             time.sleep(30)
-                    os.system(command)
+                    commands.append(command)
+                    #os.system(command)
                     #print command
-    return
+                    
+    return (True, commands)
 def check_status(link, wait, description):
     """Updates status of run"""
     try:
@@ -261,10 +265,16 @@ def main():
         time.sleep(wait*60)    
         done = check_status(link, wait, description)
 
-    results_avail = get_results(link, description)
+    results_avail, commands = get_results(link, description)
     while results_avail == False:
         time.sleep(wait*60)
-        results_avail = get_results(link, description)
-    
+        results_avail, commands = get_results(link, description)
+
+    time.sleep(60)
+    make_dir = 'mkdir ' + description
+    os.system(make_dir) 
+
+    for command in commands:
+        os.system(command)
 if __name__ == "__main__":
     main()
