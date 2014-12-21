@@ -195,4 +195,5 @@ class GetResultsException(unittest.TestCase):
         self.patcher.stop()
 
     def test_check_status_4(self):
-        assert get_results('link', 'description') == False
+        ready, _ = get_results('link', 'description')
+        assert ready == False
