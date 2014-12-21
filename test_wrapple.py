@@ -189,6 +189,24 @@ class StatusException(unittest.TestCase):
     def test_check_status_4(self):
         assert check_status('link', 1, 'description') == False
 
+def raise_missing_exception(url):
+    raise urllib2.HTTPError('link',404, "test", {}, None)
+
+class MissingException(unittest.TestCase):
+    def setUp(self):
+        self.patcher = patch('urllib2.urlopen', raise_missing_exception)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_get_results_3(self):
+        ready, _ =  get_results('link', 'description')
+        assert ready == False
+
+    def test_get_results_4(self):
+        _, commands = get_results('link', 'description')
+        assert commands == None
 
 class GetResultsException(unittest.TestCase):
     def setUp(self):
@@ -198,6 +216,6 @@ class GetResultsException(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    def test_check_status_4(self):
+    def test_get_results_1(self):
         ready, _ = get_results('link', 'description')
         assert ready == False
