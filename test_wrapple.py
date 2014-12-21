@@ -141,6 +141,10 @@ class StatusFinished(unittest.TestCase):
     def test_check_status(self):
         assert check_status('link', 1, 'description') == True
 
+    def test_get_results_2(self):
+        _, commands = get_results('link', 'description')
+        assert commands[0] == 'curl http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_summary -o description/StatusTest_summary'
+
 def run_urlopen(url):
     url_file = open('run.html', 'r')
     return url_file
