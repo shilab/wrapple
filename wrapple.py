@@ -134,7 +134,8 @@ def get_results(link, description):
                         except urllib2.HTTPError, err:
                             print err
                             print 'Oops, 404'
-                            time.sleep(30)
+                            #time.sleep(30)
+                            return (False, None)
                     commands.append(command)
                     #os.system(command)
                     #print command
