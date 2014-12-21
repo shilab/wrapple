@@ -88,7 +88,6 @@ def create_request(args):
     if not args.nearest:
         args.nearest = ''
 
-#    page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
     raw_params = {'genome':args.genome, 'numberPermutations':args.permutations,
                   'CIcutoff':cutoff, 'regUp':args.upstream,
                   'regDown':args.downstream, 'nearestgene':args.nearest,
@@ -99,8 +98,7 @@ def create_request(args):
                   'description':args.description[0], 'submit':'submit'}
     params = urllib.urlencode(raw_params)
     print params
-#    request = urllib2.Request(page, params)
-#    return send_parameters(request, args.wait, args.description[0])
+
     return (params, args.wait, args.description[0])
 
 def get_results(link, description):
@@ -109,16 +107,11 @@ def get_results(link, description):
         status_page = urllib2.urlopen(link)
         status_page_list = status_page.read().split("\n")
     except urllib2.URLError:
-        #time.sleep(wait*60)
-#        get_results(link, description)
         return (False, None)
 
     for status_line in status_page_list:
         if '_summary' in status_line:
             temp = status_line.split(">")
-            #make_dir = 'mkdir ' + description
-            #os.system(make_dir)
-            #time.sleep(60)
             commands = []
             for tag in temp:
                 if 'http:' in tag:
@@ -127,18 +120,14 @@ def get_results(link, description):
                     command = 'curl ' + tag.split("\"")[1] + ' -o ' + outfile
                     available = False
                     while not available:
-                        #TODO: Add try counter
                         try:
                             urllib2.urlopen(tag.split("\"")[1])
                             available = True
                         except urllib2.HTTPError, err:
                             print err
                             print 'Oops, 404'
-                            #time.sleep(30)
                             return (False, None)
                     commands.append(command)
-                    #os.system(command)
-                    #print command
                     
     return (True, commands)
 def check_status(link, wait, description):
@@ -147,8 +136,6 @@ def check_status(link, wait, description):
         status_page = urllib2.urlopen(link)
         status_page_list = status_page.read().split("\n")
     except urllib2.URLError:
-        #time.sleep(wait*60)
-#        return check_status(link, wait, description)
         return False
 
     for page_line in status_page_list:
@@ -156,11 +143,8 @@ def check_status(link, wait, description):
             tag = page_line.split("<BR>")
             print tag[2] + "\t" + tag[3].split("<a href")[0]
             if 'FINISHED' in tag[2]:
-                #get_results(status_page_list, description)
                 return True
             else:
-                #time.sleep(wait*60)
-                #return check_status(link, wait, description)
                 return False
 
 def check_args(genome, cutoff, nearest, specified, input_type):
@@ -244,7 +228,6 @@ def send_parameters(request, wait, description):
 
     try:
         print "The link to the status page and results is: " + link
-        #return check_status(link, wait, description)
         return (link, wait, description)
     except UnboundLocalError:
         print 'You have exceeded DAPPLE\'s use limit. Wait a bit, and resubmit.'
