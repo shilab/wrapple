@@ -1,0 +1,417 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>DAPPLE</title>
+
+<meta name="description" content="DAPPLE - Disease Association Link Evaluator"/>
+<meta name="keywords" content="DAPPLE SNP/gene protein binding search"/>
+
+<!-- Here is all of our scripting 
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+-->
+
+<script type="text/javascript">
+
+function snpInputExample() {
+document.getElementById("snpListFile").value='hi';
+}
+
+
+
+</script>
+
+    <script type="text/javascript" src="d3/d3.js"></script>
+    <script type="text/javascript" src="d3/d3.geom.js"></script>
+    <script type="text/javascript" src="d3/d3.layout.js"></script>
+
+
+<style type="text/css">
+
+	.dapple-h2 {
+	font-size: 1em;
+	}
+
+	.success {
+		color: blue;
+		padding: 10px;
+		margin: 10px;
+		border: 2px solid blue;
+	}
+
+	#dapple-form {
+		width: 80%;
+					 margin-left: auto;
+					 margin-right: auto;
+	}
+
+	.dapple-front {
+		color: black;
+		font-size: 0.9em;
+	}
+
+	.dapple-leftCol {
+	width: 40%;
+	float: left;
+	margin-right: 8%;
+	font-size: .9em;
+	}
+
+	.dapple-rightCol {
+	width: 50%;
+	float: left;
+	}
+
+	
+	.dapple-helpText {
+		font-style: italic;
+		font-size: .85em;
+	}
+	
+
+	.dapple-helpExample {
+		color: red;
+					 font-style: none;
+		font-weight: bold;
+cursor: pointer;
+	}
+
+	.dapple-submitButtons {
+		text-align: center;
+		float: left;
+		margin-top: 10px;
+width: 100%;
+	}
+
+	.clearFix {
+	width: 100%;
+float: left;
+height: 4px;
+	}
+
+
+#network {
+  font-family: Arial;
+}
+
+#network circle.node {
+ stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+#network line.link {
+ stroke: #999;
+  stroke-opacity: .6;
+}
+
+#network .nodetext {
+  font-size: .6em;
+}
+
+.network-link {
+ cursor: pointer;
+}
+
+</style>
+
+ 
+<link type="text/css" rel="stylesheet" media="all" href="/modules/book/book.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/modules/node/node.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/modules/poll/poll.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/modules/system/defaults.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/modules/system/system.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/modules/user/user.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/biblio/biblio.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/cck/theme/content-module.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/libraries/colorbox/example3/colorbox.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/ctools/css/ctools.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/date/date.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/filefield/filefield.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/google_cse/google_cse.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/panels/css/panels.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/calendar/calendar.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/misc/farbtastic/farbtastic.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/cck/modules/fieldgroup/fieldgroup.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/modules/views/css/views.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/themes/broad3/tabs.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/themes/broad3/messages.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/themes/zen/zen/block-editing.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/themes/zen/zen/wireframes.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/themes/broad3/system-menus.css?j" />
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/themes/broad3/broad3.css?j" />
+
+<link type="text/css" rel="stylesheet" media="all" href="/css/structure.css?j" />
+
+<!--[if IE]>
+<link type="text/css" rel="stylesheet" media="all" href="/sites/all/themes/zen/zen/ie.css?j" />
+<![endif]-->
+  <script type="text/javascript" src="/sites/all/modules/jquery_update/replace/jquery.min.js?j"></script>
+<script type="text/javascript" src="/misc/drupal.js?j"></script>
+<script type="text/javascript" src="/sites/all/libraries/colorbox/colorbox/jquery.colorbox-min.js?j"></script>
+<script type="text/javascript" src="/sites/all/modules/colorbox/js/colorbox.js?j"></script>
+<script type="text/javascript" src="/sites/all/modules/panels/js/panels.js?j"></script>
+<script type="text/javascript" src="/sites/all/modules/broad_tag/broad_tag.js?j"></script>
+<script type="text/javascript" src="/sites/all/themes/broad3/js/jquery.corner.js?j"></script>
+<script type="text/javascript" src="/sites/all/themes/broad3/js/header_noclick.js?j"></script>
+<script type="text/javascript" src="/sites/all/themes/broad3/script.js?j"></script>
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+jQuery.extend(Drupal.settings, { "basePath": "/", "colorbox": { "transition": "elastic", "speed": 350, "opacity": "0.85", "slideshow": false, "slideshowauto": false, "slideshowspeed": 2500, "slideshowstart": "", "slideshowstop": "", "current": "{current} of {total}", "previous": "« Prev", "next": "Next »", "close": "Close", "overlayclose": true, "maxwidth": "100%", "maxheight": "100%" }, "glossary_taxonomy": [  ] });
+//--><!]]>
+</script>
+  <script language="javascript">
+  	DATA_SERVER = "/";
+	
+  </script>
+  <!--[if lt IE 7]>
+  <script type="text/javascript" src="/sites/all/themes/broad3/js/belatedpng.js"></script>
+  <script type="text/javascript">
+    DD_belatedPNG.fix(".masked-sibling");
+  </script>									 
+  <![endif]-->
+</head>
+<body class="not-front not-logged-in node-type-section-page two-sidebars ">
+
+  <div id="page"><div id="page-inner">
+ <div id="header"><div id="header-inner" class="clear-block">
+        <div id="header-inner-content">
+
+              <div id="logo-title">
+
+                      <div id="logo"><a href="/" title="Home" rel="home"><img src="/sites/all/themes/broad3/logo.png" alt="Home" id="logo-image" /></a></div>
+          
+          
+          
+        </div> <!-- /#logo-title -->
+      
+    <div id="search-box">
+        <form action="/search/google"  accept-charset="UTF-8" method="get" id="google-cse-searchbox-form">
+<div><input type="hidden" name="cx" id="edit-cx" value="015073383559026353789:6mq4p4q4lpc"  />
+<input type="hidden" name="cof" id="edit-cof" value="FORID:11"  />
+<div class="form-item" id="edit-query-wrapper">
+ <input type="text" maxlength="128" name="query" id="edit-query" size="15" value="" title="Enter the terms you wish to search for." class="form-text" />
+</div>
+<input type="submit" name="op" id="edit-sa" value=" "  class="form-submit" />
+<input type="hidden" name="form_build_id" id="form-68b2d8fa147c633e6df9655e4a38fbf2" value="form-68b2d8fa147c633e6df9655e4a38fbf2"  />
+<input type="hidden" name="form_id" id="edit-google-cse-searchbox-form" value="google_cse_searchbox_form"  />
+
+</div></form>
+    </div> <!-- /#search-box -->
+
+
+<div id="primary" style="border-radius: 15px 15px 15px 15px;">
+        <ul class="links"><li class="menu-15050 first"><a
+        title="Academic, Industrial, Educational Partnerships"
+        href="/partnerships/partnerships">Partnerships</a></li>
+	<li class="menu-625"><a title=""
+        href="/contribute">Contribute</a></li>
+	<li class="menu-626"><a title=""
+        href="/careers/careers">Careers</a></li>
+	<li class="menu-627 last"><a title="" href="/contact">Contact
+        Us</a></li>
+</ul>     
+ </div>
+
+     
+
+<div id="secondary">
+        <ul class="menu"><li class="expanded first set-expanded"><a
+        title="" href="/what-broad/our-approach/our-approach"
+        class="">What is Broad</a><ul class="menu"><li class="leaf
+        first"><a title=""
+        href="/what-broad/our-approach/our-approach" class="">Our
+        Approach</a></li>
+<li class="leaf"><a title=""
+        href="/what-broad/areas-focus/areas-focus" class="">Areas of
+        Focus</a></li>
+<li class="leaf"><a title=""
+        href="/history-leadership/history-leadership" class="">History
+        &amp; Leadership</a></li>
+<li class="leaf"><a title="" href="/what-broad/who-broad/who-broad"
+        class="">Who is Broad</a></li>
+<li class="leaf"><a title="Partner Institutions and Community"
+        href="/what-broad/collaboration/partner-institutions-and-community"
+        class="">Partner Institutions</a></li>
+<li class="leaf last"><a title="Artist-in-Residence Program "
+        href="/what-broad/artist-residence-program"
+        class="">Artist-in-Residence</a></li>
+</ul></li>
+<li class="expanded set-expanded"><a title="" href="/news"
+        class="">News and Publications</a><ul class="menu"><li
+        class="leaf first"><a title="" href="/news" class="">News
+        &amp; Multimedia</a></li>
+<li class="leaf"><a title="" href="/publications-search"
+        class="">Scientific Publications</a></li>
+<li class="leaf"><a title=""
+        href="/news-and-publications/for-journalists" class="">For
+        Journalists</a></li>
+<li class="leaf last"><a title="" href="/blog_roll"
+        class="">BroadMinded Blog</a></li>
+</ul></li>
+<li class="expanded last set-expanded"><a title=""
+        href="/scientific-community/science" class="">For the
+        Scientific Community</a><ul class="menu"><li class="leaf
+        first"><a title="" href="/scientific-community/science"
+        class="">Science</a></li>
+<li class="leaf"><a title="" href="/scientific-community/data"
+        class="">Data</a></li>
+<li class="leaf last"><a title=""
+        href="/scientific-community/software"
+        class="">Software</a></li>
+</ul></li>
+</ul>      </div>
+
+      
+    </div><!-- /#header-inner-content -->
+    <!--MLN  Remove secondary links tabs -->
+      <!--div id="secondary-tabs" class="clear-block">
+          <ul class="links"><li class="menu-639 active-trail first active"><a href="/what-is-broad/broad-approach" title="" class="active">Our Approach</a></li>
+<li class="menu-640"><a href="/what-is-broad/areas-of-focus" title="">Areas of Focus</a></li>
+<li class="menu-641"><a href="/what-is-broad/innovation" title="">Who is Broad</a></li>
+<li class="menu-642"><a href="/what-is-broad/collaboration" title="">Collaboration</a></li>
+<li class="menu-643 last"><a href="/blog_roll" title="">Blog</a></li>
+</ul> 
+      </div-->
+      <!-- MLN End of tabs-->
+    </div></div> <!-- /#header-inner, /#header -->
+    
+        <div id="main"><div id="main-inner" class="clear-block">
+	     
+              <div id="sidebar-left"><div id="sidebar-left-inner" class="region region-left">
+          <div id="block-broad_tag-4" class="block block-broad_tag region-odd odd region-count-1 count-1"><div class="block-inner">
+
+  
+  <div class="content">
+    <div class="about-blog"><img src="/files/generic-pages/images/circle/what_is_approach.jpg" alt="" title="" /></div>  </div>
+
+  
+</div></div> <!-- /block-inner, /block -->
+        </div></div> <!-- /#sidebar-left-inner, /#sidebar-left -->
+      
+              <div id="sidebar-right"><div id="sidebar-right-inner" class="region region-right">
+          <div id="block-block-5" class="block block-block region-odd even region-count-1 count-2"><div class="block-inner">
+
+
+
+
+
+  
+  <div class="content">
+    &nbsp;  </div>
+
+  
+</div></div> <!-- /block-inner, /block --> </div></div> <!-- /#sidebar-right-inner, /#sidebar-right -->
+            <div id="content"><div id="content-inner">
+
+<!-- BEGIN Breadcrumb and Content -->
+<div id="breadcrumbs">
+<a href="/index.html">Home</a> &gt; <a href="/mpg">Medical &amp; Population Genetics</a> &gt; <a href="/mpg/dapple/">DAPPLE</a></div>
+
+
+<h1 class="science">DAPPLE Results</h1>
+<p class='dapple-front'>
+<p>Your job (ID # 1418998161) was successfully submitted to DAPPLE on 12/19/2014
+ at 09:10:28
+.<BR><BR>The status of your current job is: FINISHED<BR>Mid-job tracking: Job is 100% complete. <a href=http://www.broadinstitute.org/mpg/dapple/statusTMP.php?jid=1418998161>(click to update)</a><BR><BR>You submitted with the following specifications:<BR><BR>Email: ama234@unh.edu
+<BR>Keyword: StatusTest<BR> Genome Assembly: 19<BR> Number of permutations: 1000<BR>Common interactor binding degree: 2<BR>Iterate: false<BR>Plot: true<BR>Seed File: Manual entry<BR>Regulatory region in kb: 50,50
+<BR>Genes to specify: none<BR>Warnings: Your job was submitted without any warnings.
+<BR><BR>Since DAPPLE runs on a shared cluster, it can take hours and sometimes a day to finish, especially between the hours of 9am-6pm EST. We apologize for any delays. Please contact dapple@broadinstitute.org with questions about your submitted job and include the job ID in the email.</p>
+<p><b>Your Input Files</b></p>
+<p class='dapple-front'><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/Seeds">Input Seeds</a><BR></p>
+<p><b>Results</b> <a href="http://www.broadinstitute.org/mpg/dapple/faq.html">(Click here for FAQ page with explanation of these files)</a></p>
+<p class='dapple-front'><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_summary">StatusTest_summary</a><BR><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_directConnections">StatusTest_directConnections</a><BR><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_indirectConnections">StatusTest_indirectConnections</a><BR><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_MissingGenes">StatusTest_MissingGenes</a><BR><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_seedLocusMapping">StatusTest_seedLocusMapping</a><BR><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_plot.pdf">StatusTest_plot.pdf</a><BR><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_seedScores">StatusTest_SeedScores</a><BR><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_NetStats">StatusTest_NetStats</a><BR><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_GenesToPrioritize">StatusTest_GenesToPrioritize</a><BR><a href = "http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_CIscores">StatusTest_CIscores</a><BR></p>
+
+
+
+<h3>Network Visualization</h3>
+<p><b>NOTE:</b> Firefox supports this visualization the best so we suggest using it. Google Chrome and IE have known issues with this type of graphical display.
+
+<p>This diagram plots all proteins in the network, including common interactors: </p>
+
+<ul>
+<li><a class='network-link' id="network-primary">Hide names of primary nodes</a></li>
+<li><a class='network-link' id="network-intermediate">Show names of intermediate nodes</a></li>
+</ul>
+<div id='network'></div>
+
+<p>This diagram plots only direct connections between associated proteins:</p>
+
+<div id='networkDirect'></div>
+
+<script type='text/javascript'>
+var JOBID = 1418998161;
+</script>
+<script type='text/javascript' src='network.js'></script>
+
+    
+<p class='dapple-front'><b>Click <a href="http://www.broadinstitute.org/mpg/dapple/dappleTMP.php">here</a> to return to the DAPPLE submit page</p></b>
+
+
+  </div></div></div> <!-- /#main-inner, /#main -->
+      <div id="footer"><div id="footer-inner" class="region region-footer">
+        <div id="footer-nav-menu" class="clear-block">
+            <ul class="menu"><li class="expanded first"><a href="/what-is-broad" title="">What is Broad</a><ul class="menu"><li class="leaf first"><a href="/what-is-broad/broad-approach" title="" class="active">Our Approach</a></li>
+<li class="leaf"><a href="/what-is-broad/areas-of-focus" title="">Areas of Focus</a></li>
+<li class="leaf"><a href="/what-is-broad/innovation" title="">Who is Broad</a></li>
+<li class="leaf"><a href="/what-is-broad/collaboration" title="">Collaboration</a></li>
+<li class="leaf last"><a href="/blog_roll" title="">Blog</a></li>
+</ul></li>
+<li class="expanded"><a href="/news-and-publications" title="">News and Publications</a><ul class="menu"><li class="leaf first"><a href="/news" title="">News &amp; Multimedia</a></li>
+<li class="leaf"><a href="/publications" title="">Scientific Publications</a></li>
+<li class="leaf last"><a href="/news-and-publications/for-journalists" title="">For Journalists</a></li>
+</ul></li>
+<li class="expanded"><a href="/scientific-community" title="">For the Scientific Community</a><ul class="menu"><li class="leaf first"><a href="/scientific-community/science" title="">Science</a></li>
+<li class="leaf"><a href="/scientific-community/data" title="">Data</a></li>
+<li class="leaf last"><a href="/scientific-community/software" title="">Software</a></li>
+</ul></li>
+<li class="expanded"><a href="/history-and-leadership" title="">History &amp; Leadership</a><ul class="menu"><li class="leaf first"><a href="/history-and-leadership/history">History</a></li>
+<li class="leaf"><a href="/history-and-leadership/founders">Founders</a></li>
+<li class="leaf"><a href="/history/board-directors" title="">Board of Directors</a></li>
+<li class="leaf"><a href="/history-and-leadership/board-of-scientific-counselors" title="">Board of Scientific Counselors</a></li>
+<li class="leaf last"><a href="/history-and-leadership/leadership" title="">Leadership</a></li>
+</ul></li>
+<li class="expanded"><a href="/public/education" title="">Education</a><ul class="menu"><li class="leaf first"><a href="/diversity" title="">Diversity Initiatives</a></li>
+<li class="leaf"><a href="/education/high-school-educational-outreach" title="">High School Educational Outreach</a></li>
+<li class="leaf"><a href="/education/dnatrium" title="">DNAtrium</a></li>
+<li class="leaf last"><a href="/education/glossary">Glossary</a></li>
+</ul></li>
+<li class="leaf"><a href="/info/contribute.html" title="">Contribute</a></li>
+<li class="collapsed"><a href="/careers" title="">Careers</a></li>
+<li class="leaf last"><a href="/contact" title="">Contact Us</a></li>
+</ul>    
+        </div>
+
+        
+        <div id="block-block-4" class="block block-block region-odd odd region-count-1 count-3"><div class="block-inner">
+
+  
+  <div class="content">
+    Copyright &copy; 2010 Broad Institute. All Rights Reserved.  </div>
+
+  
+</div></div> <!-- /block-inner, /block -->
+        <ul class="links"><li class="menu-670 first"><a href="/" title="">Privacy Policy</a></li>
+<li class="menu-671 last"><a href="/" title="">Terms &amp; Conditions</a></li>
+</ul>
+      </div></div> <!-- /#footer-inner, /#footer -->
+
+  </div></div> <!-- /#page-inner, /#page -->
+
+  
+  <script type="text/javascript" src="/sites/all/modules/google_cse/google_cse.js?j"></script>
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+jQuery.extend(Drupal.settings, { "googleCSE": { "language": "en" } });
+//--><!]]>
+</script>
+	<div style="position: absolute; display: none;" id="autocomplete-results"></div>
+      
+      
+
+
+
+
+</body>
+</html>
