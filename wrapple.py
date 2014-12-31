@@ -1,6 +1,16 @@
+from __future__ import print_function
 """Python wrapper for DAPPLE"""
 __version__ = "0.0.1"
-import urllib, urllib2
+try:
+    import urllib2
+    from urllib2 import urlopen, URLError, HTTPError
+    from urllib import urlencode
+except ImportError:
+    import urllib.request as urllib2
+    from  urllib.request import urlopen
+    from urllib.error import URLError
+    from urllib.error import HTTPError
+    from urllib.parse import urlencode
 import time
 import os
 import argparse
@@ -58,15 +68,15 @@ def create_request(args):
     if args.snpfile != None:
         filename = args.snpfile[0]
     else:
-        print 'You need to provide a input file'
+        print('You need to provide a input file')
         sys.exit()
 
     if args.description == None:
-        print 'You need to provide a description'
+        print('You need to provide a description')
         sys.exit()
 
     if args.email == None:
-        print 'You need to provide an email'
+        print('You need to provide an email')
         sys.exit()
 
     cutoff = int(args.ci_cutoff)
@@ -96,17 +106,17 @@ def create_request(args):
                   'plotP':args.color_plot, 'collapseCI':args.simplify_plot,
                   'zoomedGenes':zoomed_genes, 'email':args.email[0],
                   'description':args.description[0], 'submit':'submit'}
-    params = urllib.urlencode(raw_params)
-    print params
+    params = urlencode(raw_params)
+    print(params)
 
     return (params, args.wait, args.description[0])
 
 def get_results(link, description):
     """Saves results when finished"""
     try:
-        status_page = urllib2.urlopen(link)
-        status_page_list = status_page.read().split("\n")
-    except urllib2.URLError:
+        status_page = urlopen(link)
+        status_page_list = status_page.read().decode('latin-1').split("\n")
+    except URLError:
         return (False, None)
 
     for status_line in status_page_list:
@@ -121,11 +131,11 @@ def get_results(link, description):
                     available = False
                     while not available:
                         try:
-                            urllib2.urlopen(tag.split("\"")[1])
+                            urlopen(tag.split("\"")[1])
                             available = True
-                        except urllib2.HTTPError, err:
-                            print err
-                            print 'Oops, 404'
+                        except HTTPError as  err:
+                            print(err)
+                            print('Oops, 404')
                             return (False, None)
                     commands.append(command)
                     
@@ -133,15 +143,15 @@ def get_results(link, description):
 def check_status(link, wait, description):
     """Updates status of run"""
     try:
-        status_page = urllib2.urlopen(link)
-        status_page_list = status_page.read().split("\n")
-    except urllib2.URLError:
+        status_page = urlopen(link)
+        status_page_list = status_page.read().decode('latin-1').split("\n")
+    except URLError:
         return False
 
     for page_line in status_page_list:
         if 'status' in page_line:
             tag = page_line.split("<BR>")
-            print tag[2] + "\t" + tag[3].split("<a href")[0]
+            print(tag[2] + "\t" + tag[3].split("<a href")[0])
             if 'FINISHED' in tag[2]:
                 return True
             else:
@@ -150,20 +160,20 @@ def check_status(link, wait, description):
 def check_args(genome, cutoff, nearest, specified, input_type):
     """Check for mistakes in arguments that are fatal"""
     if genome != '19' and genome != '18' and genome != '1kg':
-        print genome + ' is not a valid genome option.'
+        print(genome + ' is not a valid genome option.')
         sys.exit()
 
     if cutoff < 2 or cutoff > 10:
-        print 'CI Cutoff needs to be between 2 and 10'
+        print('CI Cutoff needs to be between 2 and 10')
         sys.exit()
 
     if (nearest == True and not (input_type[0] == 'S' or
       input_type[0] == 'R')):
-        print 'Nearest genes can only be used with SNP or region input'
+        print('Nearest genes can only be used with SNP or region input')
         sys.exit()
 
     if specified != None and input_type[0] == 'G':
-        print 'Specified genes can\'t be used with gene input'
+        print('Specified genes can\'t be used with gene input')
         sys.exit()
 
     else:
@@ -183,7 +193,7 @@ def get_zoomed_genes(zoomed):
             zoomed_genes = zoomed_genes.rstrip()
             zoomed_genes = zoomed_genes.replace('\n', ',')
         except IOError as err:
-            print err.strerror + ': ' + zoomed
+            print(err.strerror + ': ' + zoomed)
             sys.exit()
     else:
         zoomed_genes = ''
@@ -196,7 +206,7 @@ def get_specified_genes(specified):
             specified_genes = open(specified, 'r').read()
             specified_genes = specified_genes.rstrip()
         except IOError as err:
-            print err.strerror + ': ' + specified
+            print(err.strerror + ': ' + specified)
             sys.exit()
     else:
         specified_genes = ''
@@ -209,17 +219,17 @@ def get_snps(filename):
         snps = snp_file.read()
         snps = snps.rstrip()
     except IOError as err:
-        print err.strerror + ': ' + filename
+        print(err.strerror + ': ' + filename)
         sys.exit()
     return snps
 
 def send_parameters(request, wait, description):
     """Sends all the parameters to DAPPLE, starts the job"""
     try:
-        page = urllib2.urlopen(request)
-        page_list = page.read().split("\n")
-    except urllib2.URLError:
-        print 'Check your network connection'
+        page = urlopen(request)
+        page_list = page.read().decode('latin-1').split("\n")
+    except URLError:
+        print('Check your network connection')
         sys.exit()
 
     for line in page_list:
@@ -227,10 +237,10 @@ def send_parameters(request, wait, description):
             link = line.split("<a href=")[1].split(">")[0]
 
     try:
-        print "The link to the status page and results is: " + link
+        print("The link to the status page and results is: " + link)
         return (link, wait, description)
     except UnboundLocalError:
-        print 'You have exceeded DAPPLE\'s use limit. Wait a bit, and resubmit.'
+        print('You have exceeded DAPPLE\'s use limit. Wait a bit, and resubmit.')
         sys.exit()
 
 def main():
@@ -240,6 +250,7 @@ def main():
 
     page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
     params, wait, description = create_request(args)
+    params = params.encode('utf-8')
     request = urllib2.Request(page, params)
 
     link, wait, description = send_parameters(request, wait, description)

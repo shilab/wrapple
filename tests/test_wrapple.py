@@ -84,7 +84,7 @@ def status_urlopen(url):
 class sendFail(unittest.TestCase):
 
     def setUp(self):
-        self.patcher = patch('urllib2.urlopen', fail_urlopen)
+        self.patcher = patch('wrapple.urlopen', fail_urlopen)
         self.patcher.start()
 
     def tearDown(self):
@@ -98,7 +98,7 @@ class sendFail(unittest.TestCase):
 class SendSuccess(unittest.TestCase):
     
     def setUp(self):
-        self.patcher = patch('urllib2.urlopen', status_urlopen)
+        self.patcher = patch('wrapple.urlopen', status_urlopen)
         self.patcher.start()
 
     def tearDown(self):
@@ -114,7 +114,7 @@ def send_exception_urlopen(url):
 
 class SendException(unittest.TestCase):
     def setUp(self):
-        self.patcher = patch('urllib2.urlopen', send_exception_urlopen)
+        self.patcher = patch('wrapple.urlopen', send_exception_urlopen)
         self.patcher.start()
 
     def tearDown(self):
@@ -132,7 +132,7 @@ def finished_urlopen(url):
 class StatusFinished(unittest.TestCase):
 
     def setUp(self):
-        self.patcher = patch('urllib2.urlopen', finished_urlopen)
+        self.patcher = patch('wrapple.urlopen', finished_urlopen)
         self.patcher.start()
 
     def tearDown(self):
@@ -151,7 +151,7 @@ def run_urlopen(url):
 
 class StatusRun(unittest.TestCase):
     def setUp(self):
-        self.patcher = patch('urllib2.urlopen', run_urlopen)
+        self.patcher = patch('wrapple.urlopen', run_urlopen)
         self.patcher.start()
 
     def tearDown(self):
@@ -166,7 +166,7 @@ def pend_urlopen(url):
 
 class StatusPend(unittest.TestCase):
     def setUp(self):
-        self.patcher = patch('urllib2.urlopen', run_urlopen)
+        self.patcher = patch('wrapple.urlopen', run_urlopen)
         self.patcher.start()
 
     def tearDown(self):
@@ -180,7 +180,7 @@ def raise_url_exception(url):
 
 class StatusException(unittest.TestCase):
     def setUp(self):
-        self.patcher = patch('urllib2.urlopen', raise_url_exception)
+        self.patcher = patch('wrapple.urlopen', raise_url_exception)
         self.patcher.start()
 
     def tearDown(self):
@@ -194,7 +194,7 @@ def raise_missing_exception(url):
 
 class MissingException(unittest.TestCase):
     def setUp(self):
-        self.patcher = patch('urllib2.urlopen', raise_missing_exception)
+        self.patcher = patch('wrapple.urlopen', raise_missing_exception)
         self.patcher.start()
 
     def tearDown(self):
@@ -210,7 +210,7 @@ class MissingException(unittest.TestCase):
 
 class GetResultsException(unittest.TestCase):
     def setUp(self):
-        self.patcher = patch('urllib2.urlopen', raise_url_exception)
+        self.patcher = patch('wrapple.urlopen', raise_url_exception)
         self.patcher.start()
 
     def tearDown(self):
