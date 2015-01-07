@@ -74,11 +74,11 @@ def test_create_request_4():
     assert params == 'plot=False&zoomedGenes=&description=description&numberPermutations=1000&snpListFile=filename%3D%22%22&nearestgene=&CIcutoff=2&regDown=50&email=test%40test&submit=submit&genome=19&regUp=50&snpList=rs3890745%0Ars2240340%0Ars2476601&collapseCI=False&plotP=False&genesToSpecify='
 
 def fail_urlopen(url):
-    url_file = open('tests/resources/fail.html', 'r')
+    url_file = open('tests/resources/fail.html', 'rb')
     return url_file
 
 def status_urlopen(url):
-    url_file = open('tests/resources/status.html', 'r')
+    url_file = open('tests/resources/status.html', 'rb')
     return url_file
 
 class sendFail(unittest.TestCase):
@@ -126,7 +126,7 @@ class SendException(unittest.TestCase):
         _, _, _ = send_parameters(request, 1, 'description')
 
 def finished_urlopen(url):
-    url_file = open('tests/resources/finished.html', 'r')
+    url_file = open('tests/resources/finished.html', 'rb')
     return url_file
 
 class StatusFinished(unittest.TestCase):
@@ -146,7 +146,7 @@ class StatusFinished(unittest.TestCase):
         assert commands[0] == 'curl http://www.broadinstitute.org/mpg/dapple/results/1418998161/StatusTest_summary -o description/StatusTest_summary'
 
 def run_urlopen(url):
-    url_file = open('tests/resources/run.html', 'r')
+    url_file = open('tests/resources/run.html', 'rb')
     return url_file
 
 class StatusRun(unittest.TestCase):
@@ -161,7 +161,7 @@ class StatusRun(unittest.TestCase):
         assert check_status('link', 1, 'description') == False
 
 def pend_urlopen(url):
-    url_file = open('tests/resources/pend.html', 'r')
+    url_file = open('tests/resources/pend.html', 'rb')
     return url_file
 
 class StatusPend(unittest.TestCase):
