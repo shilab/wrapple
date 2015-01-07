@@ -106,10 +106,8 @@ def create_request(args):
                   'plotP':args.color_plot, 'collapseCI':args.simplify_plot,
                   'zoomedGenes':zoomed_genes, 'email':args.email[0],
                   'description':args.description[0], 'submit':'submit'}
-    params = urlencode(raw_params)
-    print(params)
-
-    return (params, args.wait, args.description[0])
+    print(raw_params)
+    return (raw_params, args.wait, args.description[0])
 
 def get_results(link, description):
     """Saves results when finished"""
@@ -249,7 +247,8 @@ def main():
     args = parser.parse_args()
 
     page = 'http://www.broadinstitute.org/mpg/dapple/dappleTMP.php'
-    params, wait, description = create_request(args)
+    raw_params, wait, description = create_request(args)
+    params = urlencode(raw_params)
     params = params.encode('utf-8')
     request = urllib2.Request(page, params)
 
