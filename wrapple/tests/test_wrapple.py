@@ -74,7 +74,6 @@ class TestRequest(unittest.TestCase):
         params, _, _ = create_request(args)
         exp_param = {'plot': False, 'zoomedGenes': '', 'description': 'description', 'numberPermutations': 1000, 'snpListFile': 'filename=""', 'nearestgene': '', 'CIcutoff': 2, 'regDown': 50, 'email': 'test@test', 'submit': 'submit', 'genome': '19', 'regUp': 50, 'snpList': 'rs3890745\nrs2240340\nrs2476601', 'collapseCI': False, 'plotP': False, 'genesToSpecify': ''}
         self.assertEqual(params, exp_param)
-    #    assert params == 'plot=False&zoomedGenes=&description=description&numberPermutations=1000&snpListFile=filename%3D%22%22&nearestgene=&CIcutoff=2&regDown=50&email=test%40test&submit=submit&genome=19&regUp=50&snpList=rs3890745%0Ars2240340%0Ars2476601&collapseCI=False&plotP=False&genesToSpecify='
 
 def fail_urlopen(url):
     url_file = open('tests/resources/fail.html', 'rb')
