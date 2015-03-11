@@ -1,4 +1,4 @@
-from wrapple import *
+from wrapple.wrapple import *
 from nose.tools import raises
 from mock import patch
 import unittest
