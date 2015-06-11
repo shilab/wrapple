@@ -1,6 +1,6 @@
 from __future__ import print_function
 """Python wrapper for DAPPLE"""
-__version__ = "0.0.1"
+__version__ = "0.0.5"
 try:
     import urllib2
     from urllib2 import urlopen, URLError, HTTPError
@@ -113,19 +113,19 @@ def get_results(link, description):
     """Saves results when finished"""
     try:
         status_page = urlopen(link)
-        status_page_list = status_page.read().decode('latin-1').split("\n")
+        lines = status_page.read().decode('latin-1').split("\n")
     except URLError:
         return (False, None)
 
-    for status_line in status_page_list:
-        if '_summary' in status_line:
-            temp = status_line.split(">")
+    for line in lines:
+        if '_summary' in line:
+            temp = line.split(">")
             commands = []
             for tag in temp:
                 if 'http:' in tag:
-                    outfile = tag.split("/")[-1].split("\"")[0]
-                    outfile = description+'/'+ outfile
-                    command = 'curl ' + tag.split("\"")[1] + ' -o ' + outfile
+                    outputfile = tag.split("/")[-1].split("\"")[0]
+                    outputfile = description+'/'+ outputfile
+                    command = 'curl ' + tag.split("\"")[1] + ' -o ' + outputfile
                     available = False
                     while not available:
                         try:
@@ -136,19 +136,20 @@ def get_results(link, description):
                             print('Oops, 404')
                             return (False, None)
                     commands.append(command)
-                    
+
     return (True, commands)
+
 def check_status(link, wait, description):
     """Updates status of run"""
     try:
         status_page = urlopen(link)
-        status_page_list = status_page.read().decode('latin-1').split("\n")
+        lines = status_page.read().decode('latin-1').split("\n")
     except URLError:
         return False
 
-    for page_line in status_page_list:
-        if 'status' in page_line:
-            tag = page_line.split("<BR>")
+    for line in lines:
+        if 'status' in line:
+            tag = line.split("<BR>")
             print(tag[2] + "\t" + tag[3].split("<a href")[0])
             if 'FINISHED' in tag[2]:
                 return True
@@ -171,7 +172,7 @@ def check_args(genome, cutoff, nearest, specified, input_type):
         sys.exit()
 
     if specified != None and input_type[0] == 'G':
-        print('Specified genes can\'t be used with gene input')
+        print('Specified genes can nott be used with gene input')
         sys.exit()
 
     else:
@@ -183,28 +184,28 @@ def change_true(arg):
         arg = 'true'
     return arg
 
-def get_zoomed_genes(zoomed):
+def get_zoomed_genes(zoomed_file):
     """Get the list of zoomed genes"""
-    if zoomed != None:
+    if zoomed_file != None:
         try:
-            zoomed_genes = open(zoomed, 'r').read()
+            zoomed_genes = open(zoomed_file, 'r').read()
             zoomed_genes = zoomed_genes.rstrip()
             zoomed_genes = zoomed_genes.replace('\n', ',')
         except IOError as err:
-            print(err.strerror + ': ' + zoomed)
+            print(err.strerror + ': ' + zoomed_file)
             sys.exit()
     else:
         zoomed_genes = ''
     return zoomed_genes
 
-def get_specified_genes(specified):
+def get_specified_genes(specified_gene_file):
     """Get the list of specified genes"""
-    if specified != None:
+    if specified_gene_file != None:
         try:
-            specified_genes = open(specified, 'r').read()
+            specified_genes = open(specified_gene_file, 'r').read()
             specified_genes = specified_genes.rstrip()
         except IOError as err:
-            print(err.strerror + ': ' + specified)
+            print(err.strerror + ': ' + specified_gene_file)
             sys.exit()
     else:
         specified_genes = ''
@@ -225,12 +226,12 @@ def send_parameters(request, wait, description):
     """Sends all the parameters to DAPPLE, starts the job"""
     try:
         page = urlopen(request)
-        page_list = page.read().decode('latin-1').split("\n")
+        lines = page.read().decode('latin-1').split("\n")
     except URLError:
         print('Check your network connection')
         sys.exit()
 
-    for line in page_list:
+    for line in lines:
         if 'status' in line:
             link = line.split("<a href=")[1].split(">")[0]
 
@@ -254,9 +255,9 @@ def main():
 
     link, wait, description = send_parameters(request, wait, description)
 
-    done = check_status(link, wait, description) 
+    done = check_status(link, wait, description)
     while done == False:
-        time.sleep(wait*60)    
+        time.sleep(wait*60)
         done = check_status(link, wait, description)
 
     results_avail, commands = get_results(link, description)
@@ -266,7 +267,7 @@ def main():
 
     time.sleep(60)
     make_dir = 'mkdir ' + description
-    os.system(make_dir) 
+    os.system(make_dir)
 
     for command in commands:
         os.system(command)
