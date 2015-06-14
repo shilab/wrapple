@@ -141,7 +141,7 @@ class StatusFinished(unittest.TestCase):
         self.patcher.stop()
         
     def test_check_status(self):
-        assert check_status('link', 1, 'description') == True
+        assert check_status('link') == True
 
     def test_get_results_2(self):
         _, commands = get_results('link', 'description')
@@ -160,7 +160,7 @@ class StatusRun(unittest.TestCase):
         self.patcher.stop()
 
     def test_check_status_2(self):
-        assert check_status('link', 1, 'description') == False
+        assert check_status('link') == False
 
 def pend_urlopen(url):
     url_file = open('test/resources/pend.html', 'rb')
@@ -175,7 +175,7 @@ class StatusPend(unittest.TestCase):
         self.patcher.stop()
 
     def test_check_status_3(self):
-        assert check_status('link', 1, 'description') == False
+        assert check_status('link') == False
 
 def raise_url_exception(url):
     raise urllib2.URLError('no host given')
@@ -189,7 +189,7 @@ class StatusException(unittest.TestCase):
         self.patcher.stop()
 
     def test_check_status_4(self):
-        assert check_status('link', 1, 'description') == False
+        assert check_status('link') == False
 
 def raise_missing_exception(url):
     raise urllib2.HTTPError('link',404, "test", {}, None)

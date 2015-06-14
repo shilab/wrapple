@@ -139,7 +139,7 @@ def get_results(link, description):
 
     return (True, commands)
 
-def check_status(link, wait, description):
+def check_status(link):
     """Updates status of run"""
     try:
         status_page = urlopen(link)
