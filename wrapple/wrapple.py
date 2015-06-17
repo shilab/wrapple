@@ -34,7 +34,7 @@ def create_parser():
                         help='Genome Assembly Options:\n19: Hg19/HapMap\n'
                         + '18: Hg18/HapMap\n1kg: Hg19/1000Genomes SNPs')
     parser.add_argument('-c', '--ci_cutoff', nargs='?', default=2,
-                        help='Common Interactor Binding Degree Cuttoff:\n'
+                        help='Common Interactor Binding Degree Cutoff:\n'
                         +'Options:2-10\nDefault:2')
     parser.add_argument('-i', '--input', nargs=1, help='Specify the type '
                         +'of input.S: SNP\nR: Region\nC: Combination\n'+
