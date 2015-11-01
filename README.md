@@ -22,8 +22,9 @@ Required Arguments
 ```-f, --snpfile```  
 	Input file  
 ```-i, --input```  
-	Type of input. 
-	S: SNP\nR: Region  
+	Type of input.  
+	S: SNP  
+	R: Region  
 	C: Combination  
 	GR: Gene-Region  
 	G: Gene  
@@ -37,7 +38,7 @@ Optional Arguments
 ```-p, --permutation```  
 	Number of permuations to run. Default is 1000.  
 ```-g, --genome```  
-	Genome assembly to use. 
+	Genome assembly to use.  
 	19: Hg19/HapMap  
 	18: Hg18/HapMap  
 	1kg: Hg19/1000Genomes SNPs  
